@@ -81,14 +81,13 @@
            gap: 10px;
            margin-bottom: 20px;
            padding: 15px 20px;
-           background-color: transparent;
-           border: 2px solid var(--modal-transparent);
+           background-color: var(--search-background);
            border-radius: 25px;
         }
         
         .task-input {
            flex-grow: 1;
-           background-color: transparent;
+           background-color: var(--overlay-color);
            border: none;
            color: var(--text-color);
            font-size: 1rem;
@@ -104,11 +103,6 @@
            cursor: pointer;
            transition: background-color 0.2s;
            backdrop-filter: blur(10px);
-        }
-        
-        .add-btn:hover {
-           background-color: #bdd6ff;
-           color: #1c1c1c;
         }
         
         .filters {
@@ -130,8 +124,8 @@
         }
         
         .filter-btn.active {
-           background-color: #bdd6ff;
-           color: #1c1c1c;
+           background-color: var(--text-color);
+           color: var(--background-color);
         }
         
         .task-list {
@@ -145,14 +139,13 @@
            align-items: center;
            gap: 10px;
            padding: 15px 20px;
-           background-color: transparent;
-           border: 2px solid var(--modal-transparent);
+           background-color: var(--search-background);
            border-radius: 25px;
            color: var(--text-color);
         }
         
         .task-item.completed {
-           border-color: var(--overlay-color);
+           background-color: var(--overlay-color);
            color: var(--secondary-text-color);
         }
         
@@ -160,16 +153,14 @@
            width: 20px;
            height: 20px;
            border-radius: 50%;
-           border: 2px solid var(--modal-transparent);
-           background-color: transparent;
+           background-color: var(--search-background);
            cursor: pointer;
            appearance: none;
            -webkit-appearance: none;
         }
         
         .task-checkbox:checked {
-           background-color: #bdd6ff;
-           border-color: #bdd6ff;
+           background-color: var(--text-color);
         }
         
         .task-text {
@@ -186,10 +177,6 @@
            border: none;
            cursor: pointer;
            font-size: 1.2rem;
-        }
-        
-        .delete-btn:hover {
-           color: #ff6b6b;
         }
         
         /* For clickable elements */
@@ -229,8 +216,8 @@
 <body>
     <div class="task-container">
         <div class="input-section">
-            <input type="text" class="task-input" placeholder="Add a new task...">
-            <button class="add-btn">Add</button>
+            <input type="text" class="task-input" placeholder="Fantaskical">
+            <button class="add-btn">New Task</button>
         </div>
         <div class="filters">
             <button class="filter-btn active" data-filter="all">All</button>
