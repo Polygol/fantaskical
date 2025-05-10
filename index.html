@@ -103,8 +103,8 @@
         }
         
         .tab-btn.active {
-            background-color: var(--accent-color);
-            color: white;
+            background-color: var(--text-color);
+            color: var(--background-color);
         }
         
         .tab-content {
@@ -279,17 +279,13 @@
             transition: background-color 0.2s;
         }
         
-        .calendar-day:hover {
-            background-color: var(--overlay-color);
-        }
-        
         .calendar-day.other-month {
             color: var(--secondary-text-color);
             opacity: 0.5;
         }
         
         .calendar-day.current-day {
-            background-color: var(--current-day-bg);
+            background-color: var(--search-background);
             font-weight: 500;
         }
         
@@ -300,7 +296,7 @@
             width: 4px;
             height: 4px;
             border-radius: 50%;
-            background-color: var(--accent-color);
+            background-color: var(--text-color);
         }
         
         .events-list {
