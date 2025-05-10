@@ -17,6 +17,8 @@
            --search-background-dark: rgba(51, 51, 51, 0.5);
            --dark-overlay: rgba(51, 51, 51, 0.2);
            --dark-transparent: rgba(255, 255, 255, 0.1); 
+           --accent-color-dark: #4d8bf0;
+           --current-day-bg-dark: rgba(77, 139, 240, 0.3);
            
            /* Light Theme Variables */
            --background-color-light: #f0f0f0;
@@ -27,6 +29,8 @@
            --search-background-light: rgba(220, 220, 220, 0.5);
            --light-overlay: rgba(220, 220, 220, 0.2);
            --light-transparent: rgba(255, 255, 255, 0.1);
+           --accent-color-light: #3a75d5;
+           --current-day-bg-light: rgba(58, 117, 213, 0.15);
            
            /* Default to Dark Theme */
            --background-color: var(--background-color-dark);
@@ -37,6 +41,8 @@
            --search-background: var(--search-background-dark);
            --overlay-color: var(--dark-overlay);
            --transparent-color: var(--dark-transparent);
+           --accent-color: var(--accent-color-dark);
+           --current-day-bg: var(--current-day-bg-dark);
         }
         
         body.light-theme {
@@ -48,6 +54,8 @@
            --search-background: var(--search-background-light);
            --overlay-color: var(--light-overlay);
            --transparent-color: var(--light-transparent);
+           --accent-color: var(--accent-color-light);
+           --current-day-bg: var(--current-day-bg-light);
         }
         
         * {
@@ -71,9 +79,40 @@
            color: var(--text-color);
         }
         
-        .task-container {
+        .container {
            width: 100%;
            max-width: 600px;
+        }
+        
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .tab-btn {
+            background-color: var(--search-background);
+            color: var(--text-color);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
         }
         
         .input-section {
@@ -85,7 +124,7 @@
            border-radius: 25px;
         }
         
-        .task-input {
+        .task-input, .event-input {
            flex-grow: 1;
            background-color: transparent;
            border: none;
@@ -179,16 +218,233 @@
            font-size: 1.2rem;
         }
         
+        /* Calendar styles */
+        .calendar-container {
+            margin-bottom: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 0 10px;
+        }
+        
+        .month-display {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            background-color: var(--search-background);
+            color: var(--text-color);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        
+        .weekday {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--secondary-text-color);
+            padding: 5px 0;
+        }
+        
+        .calendar-day {
+            position: relative;
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+        
+        .calendar-day:hover {
+            background-color: var(--overlay-color);
+        }
+        
+        .calendar-day.other-month {
+            color: var(--secondary-text-color);
+            opacity: 0.5;
+        }
+        
+        .calendar-day.current-day {
+            background-color: var(--current-day-bg);
+            font-weight: 500;
+        }
+        
+        .calendar-day.has-events::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+        }
+        
+        .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .event-date-header {
+            font-size: 1rem;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            padding: 0 10px;
+            color: var(--secondary-text-color);
+        }
+        
+        .event-item {
+            display: flex;
+            padding: 15px 20px;
+            background-color: var(--search-background);
+            border-radius: 25px;
+            color: var(--text-color);
+            align-items: center;
+        }
+        
+        .event-time {
+            margin-right: 15px;
+            min-width: 45px;
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+        
+        .event-text {
+            flex-grow: 1;
+        }
+        
+        .add-event-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s linear 0.25s, opacity 0.25s linear;
+        }
+        
+        .add-event-modal.show {
+            visibility: visible;
+            opacity: 1;
+            transition-delay: 0s;
+        }
+        
+        .modal-content {
+            background-color: var(--background-color);
+            border-radius: 15px;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .event-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .form-label {
+            font-size: 0.9rem;
+            color: var(--secondary-text-color);
+        }
+        
+        .form-input {
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: none;
+            background-color: var(--search-background);
+            color: var(--text-color);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .submit-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+        
         /* For clickable elements */
         button, 
-        .task-checkbox {
+        .task-checkbox,
+        .calendar-day {
            transform: scale(1);
            transition: transform 0.15s cubic-bezier(0.2, 0, 0.38, 0.9);
         }
         
         /* Active effect */
         button:active, 
-        .task-checkbox:active {
+        .task-checkbox:active,
+        .calendar-day:active {
            transform: scale(0.96);
            transition: transform 0.1s cubic-bezier(0.2, 0, 0.38, 0.9);
         }
@@ -201,41 +457,159 @@
         }
         
         .reduce-animations button,
-        .reduce-animations .task-checkbox {
+        .reduce-animations .task-checkbox,
+        .reduce-animations .calendar-day {
            transform: scale(1) !important;
            transition: opacity 0.3s ease !important;
         }
         
         .reduce-animations button:active,
-        .reduce-animations .task-checkbox:active {
+        .reduce-animations .task-checkbox:active,
+        .reduce-animations .calendar-day:active {
            transform: scale(0.98) !important;
            transition: none !important;
         }
     </style>
 </head>
 <body>
-    <div class="task-container">
-        <div class="input-section">
-            <input type="text" class="task-input" placeholder="Fantaskical">
-            <button class="add-btn">New Task</button>
+    <div class="container">
+        <div class="tab-container">
+            <button class="tab-btn active" data-tab="tasks">Tasks</button>
+            <button class="tab-btn" data-tab="calendar">Calendar</button>
         </div>
-        <div class="filters">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="active">Active</button>
-            <button class="filter-btn" data-filter="completed">Completed</button>
+        
+        <!-- Tasks Tab -->
+        <div class="tab-content active" id="tasks-content">
+            <div class="input-section">
+                <input type="text" class="task-input" placeholder="Fantaskical">
+                <button class="add-btn" id="add-task-btn">New Task</button>
+            </div>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="active">Active</button>
+                <button class="filter-btn" data-filter="completed">Completed</button>
+            </div>
+            <div class="task-list"></div>
         </div>
-        <div class="task-list"></div>
+        
+        <!-- Calendar Tab -->
+        <div class="tab-content" id="calendar-content">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button class="nav-btn prev-month">&lt;</button>
+                    <div class="month-display">May 2025</div>
+                    <button class="nav-btn next-month">&gt;</button>
+                </div>
+                <div class="calendar-grid">
+                    <!-- Weekday headers -->
+                    <div class="weekday">Sun</div>
+                    <div class="weekday">Mon</div>
+                    <div class="weekday">Tue</div>
+                    <div class="weekday">Wed</div>
+                    <div class="weekday">Thu</div>
+                    <div class="weekday">Fri</div>
+                    <div class="weekday">Sat</div>
+                    <!-- Calendar days will be generated by JS -->
+                </div>
+            </div>
+            <div class="input-section">
+                <input type="text" class="event-input" placeholder="Quick add event">
+                <button class="add-btn" id="quick-add-event-btn">Add</button>
+            </div>
+            <div class="events-list">
+                <!-- Events will be generated by JS -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Event Modal -->
+    <div class="add-event-modal" id="event-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add New Event</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form class="event-form" id="event-form">
+                <div class="form-group">
+                    <label class="form-label">Event Title</label>
+                    <input type="text" class="form-input" id="event-title" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-input" id="event-date" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" class="form-input" id="event-start-time">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Time</label>
+                        <input type="time" class="form-input" id="event-end-time">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-input" id="event-description">
+                </div>
+                <button type="submit" class="submit-btn">Save Event</button>
+            </form>
+        </div>
     </div>
 
     <script>
+        // Task functionality
         const taskInput = document.querySelector('.task-input');
-        const addButton = document.querySelector('.add-btn');
+        const addTaskButton = document.getElementById('add-task-btn');
         const taskList = document.querySelector('.task-list');
         const filterButtons = document.querySelectorAll('.filter-btn');
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
 
         let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
         let currentFilter = 'all';
+        
+        // Calendar functionality
+        const calendarGrid = document.querySelector('.calendar-grid');
+        const monthDisplay = document.querySelector('.month-display');
+        const prevMonthBtn = document.querySelector('.prev-month');
+        const nextMonthBtn = document.querySelector('.next-month');
+        const eventsList = document.querySelector('.events-list');
+        const eventInput = document.querySelector('.event-input');
+        const quickAddEventBtn = document.getElementById('quick-add-event-btn');
+        const eventModal = document.getElementById('event-modal');
+        const closeModalBtn = document.querySelector('.close-modal');
+        const eventForm = document.getElementById('event-form');
+        const eventDateInput = document.getElementById('event-date');
+        
+        let events = JSON.parse(localStorage.getItem('events')) || [];
+        let currentDate = new Date();
+        let selectedDate = new Date();
 
+        // Tab functionality
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                // Hide all tab contents
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Show the selected tab content
+                const tabId = button.dataset.tab + '-content';
+                document.getElementById(tabId).classList.add('active');
+                
+                // If calendar tab is selected, refresh the calendar
+                if (button.dataset.tab === 'calendar') {
+                    renderCalendar();
+                    renderEvents();
+                }
+            });
+        });
+
+        // Tasks functionality
         function addTask(text) {
             const task = {
                 id: Date.now(),
@@ -286,7 +660,7 @@
             `).join('');
         }
 
-        addButton.addEventListener('click', () => {
+        addTaskButton.addEventListener('click', () => {
             const text = taskInput.value.trim();
             if (text) {
                 addTask(text);
@@ -310,44 +684,432 @@
                 renderTasks();
             });
         });
+        
+        // Calendar functionality
+        function generateCalendarDays(year, month) {
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startOffset = firstDay.getDay(); // 0 = Sunday
+            
+            // Create array for calendar days
+            const days = [];
+            
+            // Add days from previous month
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+            for (let i = startOffset - 1; i >= 0; i--) {
+                days.push({
+                    day: prevMonthLastDay - i,
+                    month: month - 1,
+                    year: month === 0 ? year - 1 : year,
+                    currentMonth: false
+                });
+            }
+            
+            // Add days from current month
+            for (let i = 1; i <= daysInMonth; i++) {
+                days.push({
+                    day: i,
+                    month: month,
+                    year: year,
+                    currentMonth: true
+                });
+            }
+            
+            // Add days from next month
+            const remainingDays = 42 - days.length; // 6 rows * 7 days = 42
+            for (let i = 1; i <= remainingDays; i++) {
+                days.push({
+                    day: i,
+                    month: month + 1,
+                    year: month === 11 ? year + 1 : year,
+                    currentMonth: false
+                });
+            }
+            
+            return days;
+        }
+        
+        function formatDate(date) {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+        
+        function parseDate(dateString) {
+            const [year, month, day] = dateString.split('-').map(Number);
+            return new Date(year, month - 1, day);
+        }
+        
+        function formatMonthYear(date) {
+            return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        }
+        
+        function hasEvents(year, month, day) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            return events.some(event => event.date === dateStr);
+        }
+        
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const today = new Date();
+            
+            // Update month display
+            monthDisplay.textContent = formatMonthYear(currentDate);
+            
+            // Generate calendar days
+            const calendarDays = generateCalendarDays(year, month);
+            
+            // Clear existing days (except weekday headers)
+            const dayElements = calendarGrid.querySelectorAll('.calendar-day');
+            dayElements.forEach(el => el.remove());
+            
+            // Add days to calendar
+            calendarDays.forEach(dayInfo => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = dayInfo.day;
+                
+                if (!dayInfo.currentMonth) {
+                    dayElement.classList.add('other-month');
+                }
+                
+                const isToday = 
+                    dayInfo.day === today.getDate() && 
+                    dayInfo.month === today.getMonth() && 
+                    dayInfo.year === today.getFullYear();
+                
+                if (isToday) {
+                    dayElement.classList.add('current-day');
+                }
+                
+                if (hasEvents(dayInfo.year, dayInfo.month, dayInfo.day)) {
+                    dayElement.classList.add('has-events');
+                }
+                
+                dayElement.addEventListener('click', () => {
+                    selectedDate = new Date(dayInfo.year, dayInfo.month, dayInfo.day);
+                    eventDateInput.value = formatDate(selectedDate);
+                    openEventModal();
+                });
+                
+                calendarGrid.appendChild(dayElement);
+            });
+        }
+        
+        function addEvent(title, date, startTime = '', endTime = '', description = '') {
+            const event = {
+                id: Date.now(),
+                title,
+                date,
+                startTime,
+                endTime,
+                description
+            };
+            events.push(event);
+            saveEvents();
+            renderCalendar();
+            renderEvents();
+        }
+        
+        function deleteEvent(id) {
+            events = events.filter(e => e.id !== id);
+            saveEvents();
+            renderCalendar();
+            renderEvents();
+        }
+        
+        function saveEvents() {
+            localStorage.setItem('events', JSON.stringify(events));
+        }
+        
+        function formatDateForDisplay(dateStr) {
+            const date = parseDate(dateStr);
+            return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+        
+        function formatTime(timeStr) {
+            if (!timeStr) return '';
+            
+            try {
+                const [hours, minutes] = timeStr.split(':');
+                const date = new Date();
+                date.setHours(parseInt(hours, 10));
+                date.setMinutes(parseInt(minutes, 10));
+                
+                return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            } catch (e) {
+                return timeStr;
+            }
+        }
+        
+        function renderEvents() {
+            // Sort events by date and time
+            const sortedEvents = [...events].sort((a, b) => {
+                // Sort by date first
+                if (a.date !== b.date) {
+                    return a.date.localeCompare(b.date);
+                }
+                // Then by start time if available
+                if (a.startTime && b.startTime) {
+                    return a.startTime.localeCompare(b.startTime);
+                }
+                return 0;
+            });
+            
+            // Group events by date
+            const eventsByDate = {};
+            sortedEvents.forEach(event => {
+                if (!eventsByDate[event.date]) {
+                    eventsByDate[event.date] = [];
+                }
+                eventsByDate[event.date].push(event);
+            });
+            
+            // Clear events list
+            eventsList.innerHTML = '';
+            
+            // Add events to list
+            let addedHeader = false;
+            Object.keys(eventsByDate).sort().forEach(date => {
+                // Add date header
+                const dateHeader = document.createElement('div');
+                dateHeader.className = 'event-date-header';
+                dateHeader.textContent = formatDateForDisplay(date);
+                eventsList.appendChild(dateHeader);
+                addedHeader = true;
+                
+                // Add events for this date
+                eventsByDate[date].forEach(event => {
+                    const eventElement = document.createElement('div');
+                    eventElement.className = 'event-item';
+                    
+                    const timeElement = document.createElement('div');
+                    timeElement.className = 'event-time';
+                    if (event.startTime) {
+                        timeElement.textContent = formatTime(event.startTime);
+                    } else {
+                        timeElement.textContent = 'All day';
+                    }
+                    
+                    const textElement = document.createElement('div');
+                    textElement.className = 'event-text';
+                    textElement.textContent = event.title;
+                    
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-btn';
+                    deleteButton.textContent = '×';
+                    deleteButton.addEventListener('click', () => deleteEvent(event.id));
+                    
+                    eventElement.appendChild(timeElement);
+                    eventElement.appendChild(textElement);
+                    eventElement.appendChild(deleteButton);
+                    
+                    eventsList.appendChild(eventElement);
+            });
+            
+            // If no events, show a message
+            if (!addedHeader) {
+                const noEventsMsg = document.createElement('div');
+                noEventsMsg.className = 'event-date-header';
+                noEventsMsg.textContent = 'No upcoming events';
+                noEventsMsg.style.textAlign = 'center';
+                noEventsMsg.style.marginTop = '30px';
+                eventsList.appendChild(noEventsMsg);
+            }
+        }
+        
+        function parseQuickAddEvent(text) {
+            // Simple parser for "Event @ Date Time" format
+            // Examples: "Meeting @ tomorrow 3pm" or "Dentist @ May 15 10am"
+            const match = text.match(/^(.*?)(?:\s+@\s+(.*?))?$/);
+            
+            if (!match) return null;
+            
+            const title = match[1].trim();
+            let dateTimeStr = match[2] ? match[2].trim() : '';
+            
+            // Default to today
+            let date = selectedDate;
+            let startTime = '';
+            
+            // Try to parse the date/time if provided
+            if (dateTimeStr) {
+                // Check for common date keywords
+                if (dateTimeStr.toLowerCase().includes('today')) {
+                    date = new Date();
+                } else if (dateTimeStr.toLowerCase().includes('tomorrow')) {
+                    date = new Date();
+                    date.setDate(date.getDate() + 1);
+                } else {
+                    // Try to extract a date
+                    try {
+                        const parsedDate = new Date(dateTimeStr);
+                        if (!isNaN(parsedDate)) {
+                            date = parsedDate;
+                        }
+                    } catch (e) {
+                        // Invalid date format, just use selected date
+                    }
+                }
+                
+                // Try to extract time
+                const timeMatch = dateTimeStr.match(/(\d{1,2})(?::(\d{1,2}))?\s*(am|pm)?/i);
+                if (timeMatch) {
+                    let hours = parseInt(timeMatch[1], 10);
+                    const minutes = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
+                    const period = timeMatch[3] ? timeMatch[3].toLowerCase() : null;
+                    
+                    // Convert to 24-hour format if am/pm is specified
+                    if (period === 'pm' && hours < 12) {
+                        hours += 12;
+                    } else if (period === 'am' && hours === 12) {
+                        hours = 0;
+                    }
+                    
+                    startTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                }
+            }
+            
+            return {
+                title,
+                date: formatDate(date),
+                startTime
+            };
+        }
+        
+        function openEventModal() {
+            eventModal.classList.add('show');
+        }
+        
+        function closeEventModal() {
+            eventModal.classList.remove('show');
+            eventForm.reset();
+        }
+        
+        // Event listeners for calendar navigation
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
+        
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
+        
+        // Quick add event
+        quickAddEventBtn.addEventListener('click', () => {
+            const text = eventInput.value.trim();
+            if (text) {
+                const eventData = parseQuickAddEvent(text);
+                if (eventData) {
+                    addEvent(eventData.title, eventData.date, eventData.startTime);
+                    eventInput.value = '';
+                } else {
+                    // Simple fallback - just create an event with the text as title
+                    addEvent(text, formatDate(selectedDate));
+                    eventInput.value = '';
+                }
+            }
+        });
+        
+        eventInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const text = eventInput.value.trim();
+                if (text) {
+                    const eventData = parseQuickAddEvent(text);
+                    if (eventData) {
+                        addEvent(eventData.title, eventData.date, eventData.startTime);
+                        eventInput.value = '';
+                    } else {
+                        // Simple fallback - just create an event with the text as title
+                        addEvent(text, formatDate(selectedDate));
+                        eventInput.value = '';
+                    }
+                }
+            }
+        });
+        
+        // Event modal
+        closeModalBtn.addEventListener('click', closeEventModal);
+        
+        // Close modal when clicking outside
+        eventModal.addEventListener('click', (e) => {
+            if (e.target === eventModal) {
+                closeEventModal();
+            }
+        });
+        
+        // Prevent propagation when clicking modal content
+        document.querySelector('.modal-content').addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+        
+        // Event form submission
+        eventForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('event-title').value.trim();
+            const date = document.getElementById('event-date').value;
+            const startTime = document.getElementById('event-start-time').value;
+            const endTime = document.getElementById('event-end-time').value;
+            const description = document.getElementById('event-description').value.trim();
+            
+            if (title && date) {
+                addEvent(title, date, startTime, endTime, description);
+                closeEventModal();
+            }
+        });
 
-      // Theme synchronization for Gurapp side
-      document.addEventListener('DOMContentLoaded', () => {
-          // Initial theme application based on localStorage
-          const storedTheme = localStorage.getItem('theme') || 'dark';
-          document.body.classList.toggle('light-theme', storedTheme === 'light');
-          
-          // Initial animation preference application
-          const animationsEnabled = localStorage.getItem('animationsEnabled') !== 'false';
-          document.body.classList.toggle('reduce-animations', !animationsEnabled);
-          
-          // Set up listener for theme change messages
-          window.addEventListener('message', (event) => {
-              // Verify message origin and type for security
-              if (event.origin === window.location.origin) {
-                  if (event.data.type === 'themeUpdate') {
-                      const newTheme = event.data.theme;
-                      document.body.classList.toggle('light-theme', newTheme === 'light');
-                      console.log('App theme updated via message to:', newTheme);
-                  } else if (event.data.type === 'animationsUpdate') {
-                      const enableAnimations = event.data.enabled;
-                      document.body.classList.toggle('reduce-animations', !enableAnimations);
-                      console.log('App animations updated via message to:', enableAnimations ? 'enabled' : 'disabled');
-                  }
-              }
-          });
-          
-          // Optional: Set up polling fallback to ensure settings stay in sync
-          setInterval(() => {
-              const currentTheme = localStorage.getItem('theme') || 'dark';
-              document.body.classList.toggle('light-theme', currentTheme === 'light');
-              
-              const currentAnimState = localStorage.getItem('animationsEnabled') !== 'false';
-              document.body.classList.toggle('reduce-animations', !currentAnimState);
-          }, 5000);
-      });
+        // Theme synchronization for Gurapp side
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial theme application based on localStorage
+            const storedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.classList.toggle('light-theme', storedTheme === 'light');
+            
+            // Initial animation preference application
+            const animationsEnabled = localStorage.getItem('animationsEnabled') !== 'false';
+            document.body.classList.toggle('reduce-animations', !animationsEnabled);
+            
+            // Set up listener for theme change messages
+            window.addEventListener('message', (event) => {
+                // Verify message origin and type for security
+                if (event.origin === window.location.origin) {
+                    if (event.data.type === 'themeUpdate') {
+                        const newTheme = event.data.theme;
+                        document.body.classList.toggle('light-theme', newTheme === 'light');
+                        console.log('App theme updated via message to:', newTheme);
+                    } else if (event.data.type === 'animationsUpdate') {
+                        const enableAnimations = event.data.enabled;
+                        document.body.classList.toggle('reduce-animations', !enableAnimations);
+                        console.log('App animations updated via message to:', enableAnimations ? 'enabled' : 'disabled');
+                    }
+                }
+            });
+            
+            // Optional: Set up polling fallback to ensure settings stay in sync
+            setInterval(() => {
+                const currentTheme = localStorage.getItem('theme') || 'dark';
+                document.body.classList.toggle('light-theme', currentTheme === 'light');
+                
+                const currentAnimState = localStorage.getItem('animationsEnabled') !== 'false';
+                document.body.classList.toggle('reduce-animations', !currentAnimState);
+            }, 5000);
+            
+            // Set event date input default to today
+            const today = new Date();
+            eventDateInput.value = formatDate(today);
+            
+            // Initialize the app
+            renderTasks();
+            renderCalendar();
+            renderEvents();
+        });
 
-        renderTasks();
+        // Make functions accessible globally for onclick handlers
+        window.toggleTask = toggleTask;
+        window.deleteTask = deleteTask;
+        window.deleteEvent = deleteEvent;
     </script>
 </body>
 </html>
