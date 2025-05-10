@@ -104,6 +104,7 @@
             transition: top 0.3s ease;
             width: 100%;
             flex-wrap: wrap;
+            height: 80px
         }
         
         .tab-btn {
@@ -492,6 +493,14 @@
         .reduce-animations .calendar-day:active {
            transform: scale(0.98) !important;
            transition: none !important;
+        }
+
+        
+        @media (max-width: 480px) {
+            .tab-container {
+                height: 130px;
+                align-content: flex-end;
+            }
         }
     </style>
 </head>
