@@ -536,7 +536,7 @@
         .task-checkbox,
         .calendar-day {
            transform: scale(1);
-           transition: transform 0.15s cubic-bezier(0.2, 0, 0.38, 0.9);
+           transition: all 0.15s cubic-bezier(0.2, 0, 0.38, 0.9);
         }
         
         /* Active effect */
@@ -544,7 +544,8 @@
         .task-checkbox:active,
         .calendar-day:active {
            transform: scale(0.96);
-           transition: transform 0.1s cubic-bezier(0.2, 0, 0.38, 0.9);
+           transition: all 0.1s cubic-bezier(0.2, 0, 0.38, 0.9);
+           filter: brightness(1.5);
         }
         
         /* Reduce animations */
@@ -566,6 +567,7 @@
         .reduce-animations .calendar-day:active {
            transform: scale(0.98) !important;
            transition: none !important;
+           filter: brightness(1.5) !important;
         }
 
         @media (max-width: 500px) {
