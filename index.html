@@ -632,6 +632,37 @@
             <div class="task-list"></div>
         </div>
     </div>
+
+    <!-- Event Details Modal -->
+    <div class="add-event-modal" id="event-details-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="details-modal-title">Event Details</div>
+                <button class="close-modal material-symbols-rounded" onclick="closeEventDetailsModal()">close</button>
+            </div>
+            <div class="event-details-view">
+                <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <div class="form-input" id="details-title-display"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <div class="form-input" id="details-date-display"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Time</label>
+                        <div class="form-input" id="details-time-display"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <div class="form-input" id="details-description-display"></div>
+                </div>
+                <button class="submit-btn" onclick="closeEventDetailsModal()">Close</button>
+            </div>
+        </div>
+    </div>
     
     <!-- Add Event Modal -->
     <div class="add-event-modal" id="event-modal">
@@ -1006,12 +1037,26 @@
                     textElement.textContent = event.title;
                     
                     const deleteButton = document.createElement('button');
-                    deleteButton.className = 'delete-btn';
-                    deleteButton.textContent = '×';
-                    deleteButton.addEventListener('click', () => deleteEvent(event.id));
+                    deleteButton.className = 'delete-btn material-symbols-rounded'; // Use Material Symbols for consistency
+                    deleteButton.textContent = 'delete'; // Change text to symbol
+                    deleteButton.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent event details from opening when deleting
+                        deleteEvent(event.id);
+                    });
                     
+                    // NEW: Button for notification/parent-triggered action
+                    const detailButton = document.createElement('button');
+                    detailButton.className = 'detail-btn material-symbols-rounded'; // New class
+                    detailButton.textContent = 'info'; // Info icon for details
+                    detailButton.style.marginLeft = '10px'; // Add some spacing
+                    detailButton.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent quick-add modal from opening if event item clicked
+                        openEventDetailsModal(event.id); // Open the detailed modal within Fantaskical
+                    });
+
                     eventElement.appendChild(timeElement);
                     eventElement.appendChild(textElement);
+                    eventElement.appendChild(detailButton); // Add the new button
                     eventElement.appendChild(deleteButton);
                     
                     eventsList.appendChild(eventElement);
@@ -1096,6 +1141,52 @@
             eventModal.classList.remove('show');
             eventForm.reset();
         }
+
+                const eventDetailsModal = document.getElementById('event-details-modal');
+        const detailsTitleDisplay = document.getElementById('details-title-display');
+        const detailsDateDisplay = document.getElementById('details-date-display');
+        const detailsTimeDisplay = document.getElementById('details-time-display');
+        const detailsDescriptionDisplay = document.getElementById('details-description-display');
+        const detailsModalTitle = document.getElementById('details-modal-title'); // Reference to the title within the modal
+
+        function openEventDetailsModal(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) {
+                Gurasuraisu.showPopup("Event not found!");
+                return;
+            }
+
+            detailsModalTitle.textContent = event.title; // Set modal title to event title
+            detailsTitleDisplay.textContent = event.title;
+            detailsDateDisplay.textContent = formatDateForDisplay(event.date);
+            detailsTimeDisplay.textContent = `${event.startTime ? formatTime(event.startTime) : 'All Day'} ${event.endTime ? ' - ' + formatTime(event.endTime) : ''}`;
+            detailsDescriptionDisplay.textContent = event.description || 'No description provided.';
+
+            eventDetailsModal.classList.add('show');
+        }
+
+        function closeEventDetailsModal() {
+            eventDetailsModal.classList.remove('show');
+        }
+
+        // Listener for messages from the parent (Gurasuraisu) to trigger specific actions
+        window.addEventListener('message', (event) => {
+            if (event.origin !== window.location.origin) return; // Security check
+
+            const data = event.data;
+
+            // Check if this is a request from the parent to execute a Gurapp action
+            if (data && data.type === 'gurapp-action-request' && data.functionName) {
+                const func = window[data.functionName]; // Get the function by name
+
+                if (typeof func === 'function') {
+                    func.apply(window, data.args || []); // Execute the function with its arguments
+                } else {
+                    console.warn(`Fantaskical Gurapp: Function '${data.functionName}' not found or not callable.`);
+                }
+            }
+            // Other message types (like themeUpdate, animationsUpdate) are handled by gurasuraisu-api.js
+        });
         
         // Event listeners for calendar navigation
         prevMonthBtn.addEventListener('click', () => {
@@ -1184,6 +1275,8 @@
         window.toggleTask = toggleTask;
         window.deleteTask = deleteTask;
         window.deleteEvent = deleteEvent;
+        window.openEventDetailsModal = openEventDetailsModal;
+        window.closeEventDetailsModal = closeEventDetailsModal;
 
         // --- Event Notification Logic ---
         function checkEventsForNotifications() {
@@ -1208,7 +1301,13 @@
                         // Send notification via Gurasuraisu API
                         Gurasuraisu.showNotification(`Event: ${event.title}`, {
                             body: notificationBody,
-                            icon: 'calendar_clock' // Material Symbols icon name
+                            icon: 'calendar_clock', // Material Symbols icon name
+                            buttonText: "View Details", // Button text
+                            gurappAction: {
+                                appName: document.body.dataset.appName, // "Fantaskical"
+                                functionName: "openEventDetailsModal", // Function to call in this Gurapp
+                                args: [event.id] // Pass the event ID as an argument
+                            }
                         });
 
                         // Also send native browser notification if permission is granted
