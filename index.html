@@ -582,7 +582,7 @@
         }
     </style>
 </head>
-<body>
+<body data-app-name="Fantaskical">
     <div class="container">
         <div class="tab-container">
             <button class="tab-btn active" data-tab="calendar"><span class="material-symbols-rounded">event</span>Calendar</button>
@@ -691,7 +691,7 @@
         const eventForm = document.getElementById('event-form');
         const eventDateInput = document.getElementById('event-date');
         
-        let events = JSON.parse(localStorage.getItem('events')) || [];
+        events = events.map(event => ({ ...event, notified: event.notified || false }));
         let currentDate = new Date();
         let selectedDate = new Date();
 
@@ -912,7 +912,8 @@
                 date,
                 startTime,
                 endTime,
-                description
+                description,
+                notified: false // New: Flag to track if notification has been sent
             };
             events.push(event);
             saveEvents();
@@ -1183,6 +1184,53 @@
         window.toggleTask = toggleTask;
         window.deleteTask = deleteTask;
         window.deleteEvent = deleteEvent;
+
+        // --- Event Notification Logic ---
+        function checkEventsForNotifications() {
+            const now = new Date();
+            const currentDateTime = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            events.forEach(event => {
+                if (!event.notified && event.date && event.startTime) {
+                    const eventDateTime = `${event.date} ${event.startTime}`;
+                    
+                    // Check if event has started (or passed recently) and not yet notified
+                    // Allow a small window (e.g., 1 minute) after start time to catch events
+                    const eventMoment = moment(`${event.date} ${event.startTime}`);
+                    const nowMoment = moment();
+
+                    if (eventMoment.isSameOrBefore(nowMoment) && eventMoment.isAfter(nowMoment.clone().subtract(1, 'minutes'))) {
+                        let notificationBody = event.startTime ? `Starts at ${formatTime(event.startTime)}` : 'All day';
+                        if (event.description) {
+                            notificationBody += `: ${event.description}`;
+                        }
+
+                        // Send notification via Gurasuraisu API
+                        Gurasuraisu.showNotification(`Event: ${event.title}`, {
+                            body: notificationBody,
+                            icon: 'calendar_clock' // Material Symbols icon name
+                        });
+
+                        // Also send native browser notification if permission is granted
+                        if ("Notification" in window && Notification.permission === "granted") {
+                            new Notification(`🗓️ Event: ${event.title}`, {
+                                body: notificationBody,
+                                icon: 'favicon.png' // Path to your Fantaskical favicon
+                            });
+                        }
+
+                        // Mark event as notified to prevent repeated notifications
+                        event.notified = true;
+                        saveEvents(); // Save updated event state
+                    }
+                }
+            });
+        }
+
+        // Check for events every minute (or more frequently if needed, e.g., every 10 seconds for more precision)
+        setInterval(checkEventsForNotifications, 60 * 1000); 
+        // Run once on load to catch any events that started while Gurapp was closed
+        checkEventsForNotifications();
     </script>
 </body>
 </html>
