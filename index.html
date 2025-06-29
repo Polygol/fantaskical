@@ -721,8 +721,10 @@
         const eventModal = document.getElementById('event-modal');
         const eventForm = document.getElementById('event-form');
         const eventDateInput = document.getElementById('event-date');
-        
+
+        let events = JSON.parse(localStorage.getItem('events')) || [];
         events = events.map(event => ({ ...event, notified: event.notified || false }));
+        
         let currentDate = new Date();
         let selectedDate = new Date();
 
