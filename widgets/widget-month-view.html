@@ -58,51 +58,51 @@
         <div class="calendar-grid" id="calendarGrid"></div>
     </div>
     <script>
-        :root {
-            --text-color: #f9f9f9;
-            --secondary-text-color: rgba(255, 255, 255, 0.7);
-            --search-background-dark: rgba(51, 51, 51, 0.5);
-            --search-background-light: rgba(220, 220, 220, 0.5);
-            --search-background: var(--search-background-dark);
-        }
-        body.light-theme {
-            --text-color: #333333;
-            --secondary-text-color: rgba(0, 0, 0, 0.7);
-            --search-background: var(--search-background-light);
-        }
-        body {
-            background: transparent; font-family: 'Inter', sans-serif;
-            color: var(--text-color); margin: 0; padding: 10px;
-        }
-        .calendar-container {
-            display: flex; flex-direction: column; height: 100%;
-        }
-        .month-display {
-            text-align: center; font-weight: bold; font-size: 14px;
-            margin-bottom: 5px;
-        }
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 2px; flex-grow: 1;
-        }
-        .grid-cell {
-            display: flex; justify-content: center; align-items: center;
-            font-size: 10px; position: relative;
-        }
-        .weekday { color: var(--secondary-text-color); }
-        .calendar-day {
-            width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
-        }
-        .other-month { opacity: 0.4; }
-        .current-day { background-color: var(--search-background); }
-        .has-events::after {
-            content: ''; position: absolute; bottom: 1px;
-            width: 3px; height: 3px; border-radius: 50%;
-            background-color: var(--text-color);
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const monthDisplay = document.getElementById('monthDisplay');
+            const calendarGrid = document.getElementById('calendarGrid');
+            const events = JSON.parse(localStorage.getItem('events')) || [];
+            const currentDate = new Date();
+        
+            function hasEvents(year, month, day) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                return events.some(event => event.date === dateStr);
+            }
+        
+            function renderMonth() {
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                const today = new Date();
+        
+                monthDisplay.textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                calendarGrid.innerHTML = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => `<div class="grid-cell weekday">${d}</div>`).join('');
+        
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+                for (let i = 0; i < firstDay; i++) {
+                    calendarGrid.insertAdjacentHTML('beforeend', '<div class="grid-cell"></div>');
+                }
+        
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayCell = document.createElement('div');
+                    dayCell.className = 'grid-cell';
+                    const daySpan = document.createElement('span');
+                    daySpan.className = 'calendar-day';
+                    daySpan.textContent = day;
+        
+                    if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                        daySpan.classList.add('current-day');
+                    }
+                    if (hasEvents(year, month, day)) {
+                        daySpan.classList.add('has-events');
+                    }
+                    dayCell.appendChild(daySpan);
+                    calendarGrid.appendChild(dayCell);
+                }
+            }
+            renderMonth();
+        });
     </script>
 </body>
 </html>
