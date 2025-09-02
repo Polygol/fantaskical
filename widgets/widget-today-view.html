@@ -81,7 +81,7 @@
                     const events = JSON.parse(localStorage.getItem('events')) || [];
     
                     function formatTime(timeStr) {
-                        if (!timeStr) return 'Day';
+                        if (!timeStr) return 'All-day';
                         const [hours, minutes] = timeStr.split(':');
                         const date = new Date();
                         date.setHours(parseInt(hours), parseInt(minutes));
@@ -95,7 +95,7 @@
                         .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
     
                     if (todaysEvents.length === 0) {
-                        eventsList.innerHTML = '<div class="no-events">No events scheduled.</div>';
+                        eventsList.innerHTML = '<div class="no-events">No events scheduled</div>';
                     } else {
                         eventsList.innerHTML = todaysEvents.map(event => `
                             <div class="event-item">
