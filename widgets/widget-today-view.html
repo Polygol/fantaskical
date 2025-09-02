@@ -36,8 +36,8 @@
         }
         .events-list {
             flex-grow: 1;
-            overflow-y: auto;
-            font-size: 18px;
+            overflow-y: none;
+            font-size: 14px;
         }
         .event-item {
             display: flex;
@@ -81,7 +81,7 @@
                     const events = JSON.parse(localStorage.getItem('events')) || [];
     
                     function formatTime(timeStr) {
-                        if (!timeStr) return 'All-day';
+                        if (!timeStr) return 'Day';
                         const [hours, minutes] = timeStr.split(':');
                         const date = new Date();
                         date.setHours(parseInt(hours), parseInt(minutes));
