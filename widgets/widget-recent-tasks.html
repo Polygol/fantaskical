@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recent Tasks</title>
+    <script src="/assets/gurapp/api/gurasuraisu-api.js"></script>
+    <style>
+        :root {
+            --text-color: #f9f9f9;
+            --secondary-text-color: rgba(255, 255, 255, 0.7);
+        }
+        body.light-theme {
+            --text-color: #333333;
+            --secondary-text-color: rgba(0, 0, 0, 0.7);
+        }
+        body {
+            background: transparent; font-family: 'Inter', sans-serif;
+            color: var(--text-color); margin: 0; padding: 12px;
+            height: 100vh; box-sizing: border-box; overflow: hidden;
+        }
+        .header {
+            font-weight: bold; font-size: 14px; margin-bottom: 8px;
+        }
+        .task-list { font-size: 12px; }
+        .task-item {
+            display: flex; align-items: center;
+            margin-bottom: 4px;
+        }
+        .task-bullet {
+            margin-right: 8px;
+        }
+        .task-text {
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .no-tasks { color: var(--secondary-text-color); }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <div class="header">Active Tasks</div>
+        <div class="task-list" id="taskList">Loading...</div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const taskList = document.getElementById('taskList');
+            const allTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        
+            const activeTasks = allTasks
+                .filter(task => !task.completed)
+                .sort((a, b) => b.id - a.id) // Sort by most recent (descending ID)
+                .slice(0, 4); // Get the top 4
+        
+            if (activeTasks.length === 0) {
+                taskList.innerHTML = '<div class="no-tasks">All tasks complete!</div>';
+                return;
+            }
+        
+            taskList.innerHTML = activeTasks.map(task => `
+                <div class="task-item">
+                    <span class="task-bullet">•</span>
+                    <div class="task-text">${task.text}</div>
+                </div>
+            `).join('');
+        });
+    </script>
+</body>
+</html>
