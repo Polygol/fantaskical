@@ -43,26 +43,32 @@
 </head>
 <body>
     <div class="widget-container">
-        <div class="header">Tasks</div>
+        <div class="header" id="widgetHeader"></div>
         <div class="task-list" id="taskList">Loading...</div>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const taskList = document.getElementById('taskList');
+            const widgetHeader = document.getElementById('widgetHeader');
         
             function updateTasks() {
                 try {
                     const allTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+                    const allActiveTasks = allTasks.filter(task => !task.completed);
+                    
+                    // Update header with the total count of active tasks
+                    const activeCount = allActiveTasks.length;
+                    widgetHeader.textContent = `${activeCount} Active ${activeCount === 1 ? 'Task' : 'Tasks'}`;
         
-                    const activeTasks = allTasks
-                        .filter(task => !task.completed)
-                        .sort((a, b) => b.id - a.id) // Sort by most recent
-                        .slice(0, 4); // Get top 4
+                    // Get the 4 most recent tasks to display in the list
+                    const tasksToDisplay = allActiveTasks
+                        .sort((a, b) => b.id - a.id)
+                        .slice(0, 4);
         
-                    if (activeTasks.length === 0) {
+                    if (tasksToDisplay.length === 0) {
                         taskList.innerHTML = '<div class="no-tasks">All tasks completed</div>';
                     } else {
-                        taskList.innerHTML = activeTasks.map(task => `
+                        taskList.innerHTML = tasksToDisplay.map(task => `
                             <div class="task-item">
                                 <span class="task-bullet">•</span>
                                 <div class="task-text">${task.text}</div>
@@ -70,11 +76,11 @@
                         `).join('');
                     }
                 } catch(e) {
-                    taskList.innerHTML = '<div class="no-tasks">Error loading tasks.</div>';
+                    taskList.innerHTML = '<div class="no-tasks">Error</div>';
+                    widgetHeader.textContent = 'Active Tasks';
                 }
             }
         
-            // Listen for changes
             window.addEventListener('storage', (event) => {
                 if (event.key === 'tasks') {
                     updateTasks();
@@ -84,7 +90,6 @@
                 }
             });
         
-            // Initial render
             updateTasks();
         });
     </script>
