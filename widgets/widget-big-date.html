@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Date Widget</title>
+    <script src="/assets/gurapp/api/gurasuraisu-api.js"></script>
+    <style>
+        :root { --text-color: #f9f9f9; }
+        body.light-theme { --text-color: #333333; }
+        body {
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .date-container {
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
+        }
+        .weekday {
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        .day {
+            font-size: 48px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="date-container">
+        <div class="weekday" id="weekday"></div>
+        <div class="day" id="day"></div>
+    </div>
+    <script>
+        const today = new Date();
+        document.getElementById('weekday').textContent = today.toLocaleDateString('en-US', { weekday: 'long' });
+        document.getElementById('day').textContent = today.getDate();
+    </script>
+</body>
+</html>
