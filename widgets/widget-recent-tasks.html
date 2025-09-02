@@ -15,13 +15,19 @@
         }
         body {
             background: transparent; font-family: 'Inter', sans-serif;
-            color: var(--text-color); margin: 0; padding: 12px;
+            color: var(--text-color); margin: 0; padding: 20px;
             height: 100vh; box-sizing: border-box; overflow: hidden;
         }
         .header {
-            font-weight: bold; font-size: 14px; margin-bottom: 8px;
+            font-weight: bold; font-size: 18px; margin-bottom: 10px;
         }
-        .task-list { font-size: 12px; }
+        .task-list {
+            font-size: 18px;
+            line-height: 31px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         .task-item {
             display: flex; align-items: center;
             margin-bottom: 4px;
@@ -37,7 +43,7 @@
 </head>
 <body>
     <div class="widget-container">
-        <div class="header">Active Tasks</div>
+        <div class="header">Tasks</div>
         <div class="task-list" id="taskList">Loading...</div>
     </div>
     <script>
@@ -54,7 +60,7 @@
                         .slice(0, 4); // Get top 4
         
                     if (activeTasks.length === 0) {
-                        taskList.innerHTML = '<div class="no-tasks">All tasks complete!</div>';
+                        taskList.innerHTML = '<div class="no-tasks">All tasks completed</div>';
                     } else {
                         taskList.innerHTML = activeTasks.map(task => `
                             <div class="task-item">
