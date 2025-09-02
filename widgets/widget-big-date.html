@@ -40,9 +40,27 @@
         <div class="day" id="day"></div>
     </div>
     <script>
-        const today = new Date();
-        document.getElementById('weekday').textContent = today.toLocaleDateString('en-US', { weekday: 'long' });
-        document.getElementById('day').textContent = today.getDate();
+        const weekdayEl = document.getElementById('weekday');
+        const dayEl = document.getElementById('day');
+        let displayedDay = null;
+    
+        function updateDate() {
+            const today = new Date();
+            const currentDay = today.getDate();
+            
+            // Only update the DOM if the day has actually changed
+            if (currentDay !== displayedDay) {
+                weekdayEl.textContent = today.toLocaleDateString('en-US', { weekday: 'long' });
+                dayEl.textContent = currentDay;
+                displayedDay = currentDay;
+            }
+        }
+    
+        // Run the check every minute to catch the change at midnight
+        setInterval(updateDate, 60000);
+    
+        // Initial render
+        updateDate();
     </script>
-</body>
+    </body>
 </html>
