@@ -324,7 +324,7 @@
            text-decoration: line-through;
         }
         
-        .delete-btn {
+        .delete-btn, .detail-btn {
            background-color: transparent;
            color: var(--secondary-text-color);
            border: none;
@@ -685,11 +685,10 @@
     </div>
 
     <!-- Event Details Modal -->
-    <div class="add-event-modal" id="event-details-modal">
+    <div class="add-event-modal" id="event-details-modal" onclick="closeEventDetailsModal()>
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title" id="details-modal-title">Event Details</div>
-                <button class="close-modal material-symbols-rounded" onclick="closeEventDetailsModal()">close</button>
             </div>
             <div class="event-details-view">
                 <div class="form-group">
@@ -848,7 +847,7 @@
                            ${task.completed ? 'checked' : ''} 
                            onclick="toggleTask(${task.id})">
                     <span class="task-text">${task.text}</span>
-                    <button class="delete-btn" onclick="deleteTask(${task.id})">×</button>
+                    <button class="delete-btn material-symbols-rounded" onclick="deleteTask(${task.id})">cancel</button>
                 </div>
             `).join('');
         }
@@ -1091,7 +1090,7 @@
                     
                     const deleteButton = document.createElement('button');
                     deleteButton.className = 'delete-btn material-symbols-rounded'; // Use Material Symbols for consistency
-                    deleteButton.textContent = 'delete'; // Change text to symbol
+                    deleteButton.textContent = 'cancel'; // Change text to symbol
                     deleteButton.addEventListener('click', (e) => {
                         e.stopPropagation(); // Prevent event details from opening when deleting
                         deleteEvent(event.id);
