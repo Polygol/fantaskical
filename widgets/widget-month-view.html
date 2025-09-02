@@ -41,13 +41,13 @@
         .calendar-day {
             width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
+            border-radius: 50px;
         }
         .other-month { opacity: 0.4; }
         .current-day { background-color: var(--search-background); }
         .has-events::after {
             content: ''; position: absolute; bottom: 1px;
-            width: 3px; height: 3px; border-radius: 50%;
+            width: 3px; height: 3px; border-radius: 50px;
             background-color: var(--text-color);
         }
     </style>
@@ -58,39 +58,41 @@
         <div class="calendar-grid" id="calendarGrid"></div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const monthDisplay = document.getElementById('monthDisplay');
-            const calendarGrid = document.getElementById('calendarGrid');
-            const events = JSON.parse(localStorage.getItem('events')) || [];
-            const currentDate = new Date();
-        
-            function hasEvents(year, month, day) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                return events.some(event => event.date === dateStr);
-            }
-        
-            function renderMonth() {
+    document.addEventListener('DOMContentLoaded', () => {
+        const monthDisplay = document.getElementById('monthDisplay');
+        const calendarGrid = document.getElementById('calendarGrid');
+        const currentDate = new Date();
+    
+        function renderMonth() {
+            try {
+                const events = JSON.parse(localStorage.getItem('events')) || [];
+    
+                function hasEvents(year, month, day) {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    return events.some(event => event.date === dateStr);
+                }
+    
                 const year = currentDate.getFullYear();
                 const month = currentDate.getMonth();
                 const today = new Date();
-        
+    
                 monthDisplay.textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
                 calendarGrid.innerHTML = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => `<div class="grid-cell weekday">${d}</div>`).join('');
-        
+    
                 const firstDay = new Date(year, month, 1).getDay();
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
-        
+    
                 for (let i = 0; i < firstDay; i++) {
                     calendarGrid.insertAdjacentHTML('beforeend', '<div class="grid-cell"></div>');
                 }
-        
+    
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dayCell = document.createElement('div');
                     dayCell.className = 'grid-cell';
                     const daySpan = document.createElement('span');
                     daySpan.className = 'calendar-day';
                     daySpan.textContent = day;
-        
+    
                     if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
                         daySpan.classList.add('current-day');
                     }
@@ -100,9 +102,24 @@
                     dayCell.appendChild(daySpan);
                     calendarGrid.appendChild(dayCell);
                 }
+            } catch(e) {
+                monthDisplay.textContent = "Error";
             }
-            renderMonth();
+        }
+    
+        // Listen for changes
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'events') {
+                renderMonth();
+            }
+            if (event.key === 'theme') {
+                document.body.classList.toggle('light-theme', event.newValue === 'light');
+            }
         });
+    
+        // Initial render
+        renderMonth();
+    });
     </script>
 </body>
 </html>
