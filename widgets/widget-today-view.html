@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Today's Events</title>
+    <script src="/assets/gurapp/api/gurasuraisu-api.js"></script>
+    <style>
+        :root {
+            --text-color: #f9f9f9;
+            --secondary-text-color: rgba(255, 255, 255, 0.7);
+        }
+        body.light-theme {
+            --text-color: #333333;
+            --secondary-text-color: rgba(0, 0, 0, 0.7);
+        }
+        body {
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 12px;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .widget-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .header {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+        .events-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        .event-item {
+            display: flex;
+            margin-bottom: 4px;
+        }
+        .event-time {
+            color: var(--secondary-text-color);
+            width: 60px;
+            flex-shrink: 0;
+        }
+        .event-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .no-events {
+            color: var(--secondary-text-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <div class="header">Today's Events</div>
+        <div class="events-list" id="eventsList">Loading...</div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const eventsList = document.getElementById('eventsList');
+            const events = JSON.parse(localStorage.getItem('events')) || [];
+        
+            function formatTime(timeStr) {
+                if (!timeStr) return 'All-day';
+                const [hours, minutes] = timeStr.split(':');
+                const date = new Date();
+                date.setHours(parseInt(hours), parseInt(minutes));
+                return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            }
+        
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        
+            const todaysEvents = events
+                .filter(event => event.date === todayStr)
+                .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+        
+            if (todaysEvents.length === 0) {
+                eventsList.innerHTML = '<div class="no-events">No events scheduled for today.</div>';
+                return;
+            }
+        
+            eventsList.innerHTML = todaysEvents.map(event => `
+                <div class="event-item">
+                    <div class="event-time">${formatTime(event.startTime)}</div>
+                    <div class="event-title">${event.title}</div>
+                </div>
+            `).join('');
+        });
+    </script>
+</body>
+</html>
