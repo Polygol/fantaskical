@@ -1379,6 +1379,48 @@
             });
         }
 
+        window.addEventListener('GurasuraisuReady', () => {
+            // 1. Calendar Today View
+            Gurasuraisu.registerWidget({
+                appName: 'Fantaskical',
+                widgetId: 'fantaskical-today-view',
+                title: 'Today\'s Events',
+                url: '/fantaskical/widgets/widget-today-view.html',
+                defaultSize: [2, 2],
+                openUrl: '/fantaskical/index.html'
+            });
+        
+            // 2. Calendar Big Date
+            Gurasuraisu.registerWidget({
+                appName: 'Fantaskical',
+                widgetId: 'fantaskical-big-date',
+                title: 'Date',
+                url: '/fantaskical/widgets/widget-big-date.html',
+                defaultSize: [1, 1],
+                openUrl: '/fantaskical/index.html'
+            });
+        
+            // 3. Calendar Month View
+            Gurasuraisu.registerWidget({
+                appName: 'Fantaskical',
+                widgetId: 'fantaskical-month-view',
+                title: 'Month Calendar',
+                url: '/fantaskical/widgets/widget-month-view.html',
+                defaultSize: [2, 2],
+                openUrl: '/fantaskical/index.html'
+            });
+        
+            // 4. Top 4 Recent Active Tasks
+            Gurasuraisu.registerWidget({
+                appName: 'Fantaskical',
+                widgetId: 'fantaskical-recent-tasks',
+                title: 'Recent Tasks',
+                url: '/fantaskical/widgets/widget-recent-tasks.html',
+                defaultSize: [2, 2],
+                openUrl: '/fantaskical/index.html'
+            });
+        });
+
         // Check for events every minute (or more frequently if needed, e.g., every 10 seconds for more precision)
         setInterval(checkEventsForNotifications, 60 * 1000); 
         // Run once on load to catch any events that started while Gurapp was closed
