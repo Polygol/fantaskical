@@ -30,14 +30,14 @@
         }
         .header {
             font-weight: bold;
-            font-size: 14px;
+            font-size: 18px;
             margin-bottom: 8px;
             flex-shrink: 0;
         }
         .events-list {
             flex-grow: 1;
             overflow-y: auto;
-            font-size: 12px;
+            font-size: 18px;
         }
         .event-item {
             display: flex;
@@ -60,15 +60,23 @@
 </head>
 <body>
     <div class="widget-container">
-        <div class="header">Today's Events</div>
+        <div class="header" id="widgetHeader"></div>
         <div class="events-list" id="eventsList">Loading...</div>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const eventsList = document.getElementById('eventsList');
+            const widgetHeader = document.getElementById('widgetHeader');
+    
+            // Set the header date immediately on load
+            const today = new Date();
+            widgetHeader.textContent = today.toLocaleDateString('en-US', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short'
+            });
     
             function updateTodaysEvents() {
-                // Use a try-catch block in case localStorage is empty or malformed
                 try {
                     const events = JSON.parse(localStorage.getItem('events')) || [];
     
@@ -77,10 +85,9 @@
                         const [hours, minutes] = timeStr.split(':');
                         const date = new Date();
                         date.setHours(parseInt(hours), parseInt(minutes));
-                        return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                        return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
                     }
     
-                    const today = new Date();
                     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     
                     const todaysEvents = events
@@ -88,7 +95,7 @@
                         .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
     
                     if (todaysEvents.length === 0) {
-                        eventsList.innerHTML = '<div class="no-events">No events scheduled for today.</div>';
+                        eventsList.innerHTML = '<div class="no-events">No events scheduled.</div>';
                     } else {
                         eventsList.innerHTML = todaysEvents.map(event => `
                             <div class="event-item">
@@ -98,22 +105,19 @@
                         `).join('');
                     }
                 } catch (e) {
-                    eventsList.innerHTML = '<div class="no-events">Error loading events.</div>';
+                    eventsList.innerHTML = '<div class="no-events">Error</div>';
                 }
             }
     
-            // Listen for changes from other tabs/windows
             window.addEventListener('storage', (event) => {
                 if (event.key === 'events') {
                     updateTodaysEvents();
                 }
-                // Also listen for theme changes
                 if (event.key === 'theme') {
                     document.body.classList.toggle('light-theme', event.newValue === 'light');
                 }
             });
     
-            // Initial render
             updateTodaysEvents();
         });
     </script>
