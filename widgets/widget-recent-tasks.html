@@ -43,24 +43,43 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const taskList = document.getElementById('taskList');
-            const allTasks = JSON.parse(localStorage.getItem('tasks')) || [];
         
-            const activeTasks = allTasks
-                .filter(task => !task.completed)
-                .sort((a, b) => b.id - a.id) // Sort by most recent (descending ID)
-                .slice(0, 4); // Get the top 4
+            function updateTasks() {
+                try {
+                    const allTasks = JSON.parse(localStorage.getItem('tasks')) || [];
         
-            if (activeTasks.length === 0) {
-                taskList.innerHTML = '<div class="no-tasks">All tasks complete!</div>';
-                return;
+                    const activeTasks = allTasks
+                        .filter(task => !task.completed)
+                        .sort((a, b) => b.id - a.id) // Sort by most recent
+                        .slice(0, 4); // Get top 4
+        
+                    if (activeTasks.length === 0) {
+                        taskList.innerHTML = '<div class="no-tasks">All tasks complete!</div>';
+                    } else {
+                        taskList.innerHTML = activeTasks.map(task => `
+                            <div class="task-item">
+                                <span class="task-bullet">•</span>
+                                <div class="task-text">${task.text}</div>
+                            </div>
+                        `).join('');
+                    }
+                } catch(e) {
+                    taskList.innerHTML = '<div class="no-tasks">Error loading tasks.</div>';
+                }
             }
         
-            taskList.innerHTML = activeTasks.map(task => `
-                <div class="task-item">
-                    <span class="task-bullet">•</span>
-                    <div class="task-text">${task.text}</div>
-                </div>
-            `).join('');
+            // Listen for changes
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'tasks') {
+                    updateTasks();
+                }
+                if (event.key === 'theme') {
+                    document.body.classList.toggle('light-theme', event.newValue === 'light');
+                }
+            });
+        
+            // Initial render
+            updateTasks();
         });
     </script>
 </body>
