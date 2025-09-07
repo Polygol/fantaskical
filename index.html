@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
+            --sun-shadow: none; /* Default value when not inside Polygol */
             --edge-refraction-filter: url('#edge-refraction-only');
             
             /* Dark Theme (Default) Variables */
@@ -199,6 +200,7 @@
             align-items: center;
             gap: 8px;
             backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
+            box-shadow: var(--sun-shadow);
             border: 1px solid var(--glass-border);
         }
 
@@ -258,6 +260,7 @@
            cursor: pointer;
            transition: background-color 0.2s;
            backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
+           box-shadow: var(--sun-shadow);
         }
         
         .filters {
@@ -276,6 +279,7 @@
            cursor: pointer;
            transition: background-color 0.2s;
            backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
+            box-shadow: var(--sun-shadow);
         }
         
         .filter-btn.active {
@@ -487,7 +491,7 @@
             max-width: 500px;
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(10px) saturate(2) var(--edge-refraction-filter);
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--sun-shadow), 0 0 50px rgba(0, 0, 0, 0.2);
         }
         
         .modal-header {
