@@ -240,6 +240,8 @@
            background-color: var(--search-background);
            border-radius: 25px;
            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
+            box-shadow: var(--sun-shadow);
         }
         
         .task-input, .event-input {
@@ -252,20 +254,17 @@
         }
         
         .add-btn {
-           background-color: var(--search-background);
+           background-color: transparent;
            color: var(--text-color);
-           border: 1px solid var(--glass-border);
+           border: none;
            border-radius: 25px;
-           padding: 8px 15px;
            cursor: pointer;
            transition: background-color 0.2s;
-           backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
-           box-shadow: var(--sun-shadow);
         }
         
         .filters {
            display: flex;
-           gap: 10px;
+           gap: 5px;
            margin-bottom: 20px;
            justify-content: center;
         }
@@ -274,7 +273,7 @@
            background-color: var(--search-background);
            color: var(--text-color);
            border: 1px solid var(--glass-border);
-           border-radius: 25px;
+           border-radius: 10px;
            padding: 8px 15px;
            cursor: pointer;
            transition: background-color 0.2s;
@@ -283,8 +282,9 @@
         }
         
         .filter-btn.active {
-           background-color: var(--text-color);
+           background-color: var(--secondary-text-color);
            color: var(--background-color);
+           border-radius: 25px !important;
         }
         
         .task-list {
@@ -302,11 +302,12 @@
            border-radius: 25px;
            color: var(--text-color);
            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
+            box-shadow: var(--sun-shadow);
         }
         
         .task-item.completed {
-           background-color: var(--overlay-color);
-           color: var(--secondary-text-color);
+           opacity: 0.5;
         }
         
         .task-checkbox {
@@ -366,9 +367,9 @@
         }
         
         .nav-btn {
-            background-color: var(--search-background);
+            background-color: transparent;
             color: var(--text-color);
-            border: 1px solid var(--glass-border);
+            border: none;
             border-radius: 50%;
             width: 30px;
             height: 30px;
@@ -413,6 +414,8 @@
             border-radius: 25px;
             font-weight: 500;
             border: 1px solid var(--glass-border);
+            backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
+            box-shadow: var(--sun-shadow);
         }
         
         .calendar-day.has-events::after {
@@ -448,6 +451,8 @@
             color: var(--text-color);
             align-items: center;
             border: 1px solid var(--glass-border);
+            backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
+            box-shadow: var(--sun-shadow);
         }
         
         .event-time {
@@ -486,7 +491,7 @@
         .modal-content {
             background-color: var(--search-background);
             border-radius: 40px;
-            padding: 20px;
+            padding: 25px;
             width: 90%;
             max-width: 500px;
             border: 1px solid var(--glass-border);
@@ -498,7 +503,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            padding: 0 8px;
         }
         
         .modal-title {
@@ -524,7 +530,8 @@
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
+            margin-bottom: 20px;
         }
         
         .form-label {
@@ -532,12 +539,15 @@
             color: var(--secondary-text-color);
         }
         
-        .form-input {
-            padding: 10px 15px;
-            border-radius: 10px;
+        .form-input, .form-textarea {
+            padding: 12px 16px
+            border-radius: 15px;
             border: 1px solid var(--glass-border);
             background-color: var(--search-background);
             color: var(--text-color);
+            box-shadow: var(--sun-shadow);
+            font-size: 1rem;
+            outline: none;
         }
         
         .form-row {
@@ -694,9 +704,9 @@
                 <button class="add-btn" id="add-task-btn"><span class="material-symbols-rounded">add</span></button>
             </div>
             <div class="filters">
-                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn active" data-filter="all" style="border-radius: 10px 25px 25px 10px;">All</button>
                 <button class="filter-btn" data-filter="active">Active</button>
-                <button class="filter-btn" data-filter="completed">Completed</button>
+                <button class="filter-btn" data-filter="completed" style="border-radius: 25px 10px 10px 25px;">Completed</button>
             </div>
             <div class="task-list"></div>
         </div>
