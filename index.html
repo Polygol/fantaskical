@@ -200,35 +200,53 @@
         }
         
         .input-section {
-           display: flex;
-           gap: 10px;
-           margin-bottom: 20px;
-           padding: 15px 20px;
-           background-color: var(--search-background);
-           border-radius: 25px;
-           border: 1px solid var(--glass-border);
-            backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
-            box-shadow: var(--sun-shadow);
+            display: flex;
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 500px;
+            width: 90%;
         }
         
         .task-input, .event-input {
-           flex-grow: 1;
-           background-color: transparent;
-           border: none;
-           color: var(--text-color);
-           font-size: 1rem;
-           outline: none;
+            flex-grow: 1;
+            background-color: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1rem;
+            outline: none;
+            padding: 15px 20px;
+            background-color: var(--search-background);
+            border-radius: 32px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
+            box-shadow: var(--sun-shadow), 0 0 15px rgba(0, 0, 0, 0.05);
+            margin-right: 15px;
         }
         
         .add-btn {
-           background-color: transparent;
-           color: var(--text-color);
-           border: none;
-           border-radius: 25px;
-           cursor: pointer;
-           transition: background-color 0.2s;
+            padding: 15px 15px;
+            background-color: var(--search-background);
+            border-radius: 32px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
+            box-shadow: var(--sun-shadow), 0 0 15px rgba(0, 0, 0, 0.05);
         }
-        
+
+        .task-input, .event-input:focus {
+            margin-right: 0;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .input-section:has(.task-input:focus) .add-btn,
+        .input-section:has(.event-input:focus) .add-btn {
+            scale: 0;
+            width: 0;
+            opacity: 0;
+        }
+                
         .filters {
            display: flex;
            gap: 5px;
