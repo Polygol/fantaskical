@@ -224,6 +224,7 @@
             backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
             box-shadow: var(--sun-shadow), 0 0 15px rgba(0, 0, 0, 0.05);
             margin-right: 15px;
+            transition: all 0.3s cubic-bezier(.3,1.2,.64,1);
         }
         
         .add-btn {
@@ -233,12 +234,13 @@
             border: 1px solid var(--glass-border);
             backdrop-filter: blur(5px) saturate(2) var(--edge-refraction-filter);
             box-shadow: var(--sun-shadow), 0 0 15px rgba(0, 0, 0, 0.05);
+            color: var(--text-color);
+            transition: all 0.3s cubic-bezier(.3,1.2,.64,1);
         }
 
         .task-input, .event-input:focus {
             margin-right: 0;
-            max-width: 500px;
-            width: 90%;
+            min-width: 100%;
         }
 
         .input-section:has(.task-input:focus) .add-btn,
