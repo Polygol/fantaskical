@@ -193,6 +193,7 @@
         
         .tab-content {
             display: none;
+            margin-bottom: 120px;
         }
         
         .tab-content.active {
@@ -248,10 +249,13 @@
         }
                 
         .filters {
-           display: flex;
-           gap: 5px;
-           margin-bottom: 20px;
-           justify-content: center;
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
         }
         
         .filter-btn {
