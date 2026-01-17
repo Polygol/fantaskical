@@ -1288,35 +1288,27 @@
                     const eventDateTime = `${event.date} ${event.startTime}`;
                     
                     // Check if event has started (or passed recently) and not yet notified
-                    // Allow a small window (e.g., 1 minute) after start time to catch events
+                    // Allow a small window (e.g., 5 minutes) after start time to catch events
                     const eventMoment = moment(`${event.date} ${event.startTime}`);
                     const nowMoment = moment();
 
-                    if (eventMoment.isSameOrBefore(nowMoment) && eventMoment.isAfter(nowMoment.clone().subtract(1, 'minutes'))) {
+                    if (eventMoment.isSameOrBefore(nowMoment) && eventMoment.isAfter(nowMoment.clone().subtract(5, 'minutes'))) {
                         let notificationBody = event.startTime ? `Starts at ${formatTime(event.startTime)}` : 'All day';
                         if (event.description) {
                             notificationBody += `: ${event.description}`;
                         }
 
                         // Send notification via Gurasuraisu API
-                        Gurasuraisu.showNotification(`Event: ${event.title}`, {
-                            body: notificationBody,
+                        Gurasuraisu.showNotification(`Event starting now`, {
+                            heading: '${event.title}',
                             icon: 'calendar_clock', // Material Symbols icon name
-                            buttonText: "View Details", // Button text
+                            buttonText: "Details", // Button text
                             gurappAction: {
                                 appName: document.body.dataset.appName, // "Fantaskical"
                                 functionName: "openEventDetailsModal", // Function to call in this Gurapp
                                 args: [event.id] // Pass the event ID as an argument
                             }
                         });
-
-                        // Also send native browser notification if permission is granted
-                        if ("Notification" in window && Notification.permission === "granted") {
-                            new Notification(`🗓️ Event: ${event.title}`, {
-                                body: notificationBody,
-                                icon: 'favicon.png' // Path to your Fantaskical favicon
-                            });
-                        }
 
                         // Mark event as notified to prevent repeated notifications
                         event.notified = true;
