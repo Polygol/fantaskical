@@ -3,11 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Fantaskical</title>
+    <title data-lang-key="TITLE">Fantaskical</title>
+    <script src="lang.js">
+        // --- Internationalization (i18n) Support ---
+        function getAppLanguage() {
+            let l = (localStorage.getItem('language') || localStorage.getItem('selectedLanguage') || 'EN').toUpperCase();
+            if (l === 'JA') l = 'JP';
+            return ['EN', 'JP', 'KO', 'ZH'].includes(l) ? l : 'EN';
+        }
+
+        function t(key, params = {}) {
+            const lang = getAppLanguage();
+            const dict = window['LANG_' + lang + '_FANTASKICAL'] || window['LANG_EN_FANTASKICAL'] || {};
+            let str = dict[key] || key;
+            Object.keys(params).forEach(p => {
+                str = str.replace(new RegExp('\\{' + p + '\\}', 'g'), params[p]);
+            });
+            return str;
+        }
+
+        function applyLanguage(langCode) {
+            if (langCode) localStorage.setItem('language', langCode);
+            const lang = getAppLanguage();
+            const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
+            document.documentElement.lang = bcpMap[lang] || 'en-US';
+            document.querySelectorAll('[data-lang-key]').forEach(el => {
+                const k = el.getAttribute('data-lang-key');
+                if (k) {
+                    if (el.tagName === 'TITLE') {
+                        document.title = t(k);
+                    } else {
+                        el.textContent = t(k);
+                    }
+                }
+            });
+            document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
+                const k = el.getAttribute('data-lang-placeholder');
+                if (k) el.placeholder = t(k);
+            });
+            document.querySelectorAll('[data-lang-title]').forEach(el => {
+                const k = el.getAttribute('data-lang-title');
+                if (k) el.title = t(k);
+            });
+            if (typeof onLanguageChanged === 'function') {
+                onLanguageChanged(lang);
+            }
+        }
+
+        window.addEventListener('message', (e) => {
+            if (e.data && (e.data.type === 'languageUpdate' || e.data.type === 'localeUpdate')) {
+                applyLanguage(e.data.languageCode);
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => applyLanguage());
+        
+
+    </script>
     <link rel="icon" href="favicon.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,700,1,0" />
-    <script src="https://cdn.jsdelivr.net/gh/Polygol/polygol.github.io@main/assets/gurapp/api/gurasuraisu-api.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/Polygol/polygol.github.io@main/assets/polygolapp/api/polygol-api.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <style>
@@ -473,8 +529,8 @@
 <body data-app-name="FANTASKICAL">
     <div class="container">
         <div class="toolbar">
-            <button class="tab-btn active" data-tab="calendar"><span class="material-symbols-rounded">event</span>Calendar</button>
-            <button class="tab-btn" data-tab="tasks"><span class="material-symbols-rounded">task_alt</span>Tasks</button>
+            <button class="tab-btn active" data-tab="calendar"><span class="material-symbols-rounded">event</span><span data-lang-key="CALENDAR">Calendar</span></button>
+            <button class="tab-btn" data-tab="tasks"><span class="material-symbols-rounded">task_alt</span><span data-lang-key="TASKS">Tasks</span></button>
         </div>
         
         <!-- Calendar Tab -->
@@ -487,18 +543,18 @@
                 </div>
                 <div class="calendar-grid">
                     <!-- Weekday headers -->
-                    <div class="weekday">Sun</div>
-                    <div class="weekday">Mon</div>
-                    <div class="weekday">Tue</div>
-                    <div class="weekday">Wed</div>
-                    <div class="weekday">Thu</div>
-                    <div class="weekday">Fri</div>
-                    <div class="weekday">Sat</div>
+                    <div class="weekday" data-lang-key="SUN">Sun</div>
+                    <div class="weekday" data-lang-key="MON">Mon</div>
+                    <div class="weekday" data-lang-key="TUE">Tue</div>
+                    <div class="weekday" data-lang-key="WED">Wed</div>
+                    <div class="weekday" data-lang-key="THU">Thu</div>
+                    <div class="weekday" data-lang-key="FRI">Fri</div>
+                    <div class="weekday" data-lang-key="SAT">Sat</div>
                     <!-- Calendar days will be generated by JS -->
                 </div>
             </div>
             <div class="input-section">
-                <input type="text" class="event-input" placeholder="Add event">
+                <input type="text" class="event-input" data-lang-placeholder="ADD_EVENT_PLACEHOLDER" placeholder="Add event">
                 <button class="add-btn" id="quick-add-event-btn"><span class="material-symbols-rounded">add</span></button>
             </div>
             <div class="events-list">
@@ -509,13 +565,13 @@
         <!-- Tasks Tab -->
         <div class="tab-content" id="tasks-content">
             <div class="input-section">
-                <input type="text" class="task-input" placeholder="Add task">
+                <input type="text" class="task-input" data-lang-placeholder="ADD_TASK_PLACEHOLDER" placeholder="Add task">
                 <button class="add-btn" id="add-task-btn"><span class="material-symbols-rounded">add</span></button>
             </div>
             <div class="filters">
-                <button class="filter-btn active" data-filter="all" style="border-radius: 25px 10px 10px 25px;">All</button>
-                <button class="filter-btn" data-filter="active">Active</button>
-                <button class="filter-btn" data-filter="completed" style="border-radius: 10px 25px 25px 10px;">Completed</button>
+                <button class="filter-btn active" data-filter="all" data-lang-key="ALL" style="border-radius: 25px 10px 10px 25px;">All</button>
+                <button class="filter-btn" data-filter="active" data-lang-key="ACTIVE">Active</button>
+                <button class="filter-btn" data-filter="completed" data-lang-key="COMPLETED" style="border-radius: 10px 25px 25px 10px;">Completed</button>
             </div>
             <div class="task-list"></div>
         </div>
@@ -525,28 +581,28 @@
     <div class="add-event-modal" id="event-details-modal" onclick="closeEventDetailsModal()">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title" id="details-modal-title">Event Details</div>
+                <div class="modal-title" id="details-modal-title" data-lang-key="EVENT_DETAILS_TITLE">Event Details</div>
             </div>
             <div class="event-details-view">
                 <div class="form-group">
-                    <label class="form-label">Title</label>
+                    <label class="form-label" data-lang-key="EVENT_TITLE_LABEL">Title</label>
                     <div class="form-input" id="details-title-display"></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Date</label>
+                        <label class="form-label" data-lang-key="EVENT_DATE_LABEL">Date</label>
                         <div class="form-input" id="details-date-display"></div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Time</label>
+                        <label class="form-label" data-lang-key="TIME_LABEL">Time</label>
                         <div class="form-input" id="details-time-display"></div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Description</label>
+                    <label class="form-label" data-lang-key="DESCRIPTION_LABEL">Description</label>
                     <div class="form-input" id="details-description-display"></div>
                 </div>
-                <button class="submit-btn" onclick="closeEventDetailsModal()">Close</button>
+                <button class="submit-btn" onclick="closeEventDetailsModal()" data-lang-key="CLOSE_BTN">Close</button>
             </div>
         </div>
     </div>
@@ -555,7 +611,7 @@
     <div class="add-event-modal" id="event-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">Add New Event</div>
+                <div class="modal-title" data-lang-key="ADD_EVENT_MODAL_TITLE">Add New Event</div>
             </div>
             <form class="event-form" id="event-form">
                 <div class="form-group">
@@ -1041,7 +1097,7 @@
         function openEventDetailsModal(eventId) {
             const event = events.find(e => e.id === eventId);
             if (!event) {
-                Gurasuraisu.showPopup("Event not found!");
+                Polygol.showPopup("Event not found!");
                 return;
             }
 
@@ -1058,23 +1114,23 @@
             eventDetailsModal.classList.remove('show');
         }
 
-        // Listener for messages from the parent (Gurasuraisu) to trigger specific actions
+        // Listener for messages from the parent (Polygol) to trigger specific actions
         window.addEventListener('message', (event) => {
             if (event.origin !== window.location.origin) return; // Security check
 
             const data = event.data;
 
-            // Check if this is a request from the parent to execute a Gurapp action
-            if (data && data.type === 'gurapp-action-request' && data.functionName) {
+            // Check if this is a request from the parent to execute a Polygolapp action
+            if (data && data.type === 'polygolapp-action-request' && data.functionName) {
                 const func = window[data.functionName]; // Get the function by name
 
                 if (typeof func === 'function') {
                     func.apply(window, data.args || []); // Execute the function with its arguments
                 } else {
-                    console.warn(`Fantaskical Gurapp: Function '${data.functionName}' not found or not callable.`);
+                    console.warn(`Fantaskical Polygolapp: Function '${data.functionName}' not found or not callable.`);
                 }
             }
-            // Other message types (like themeUpdate, animationsUpdate) are handled by gurasuraisu-api.js
+            // Other message types (like themeUpdate, animationsUpdate) are handled by polygol-api.js
         });
         
         // Event listeners for calendar navigation
@@ -1187,14 +1243,14 @@
                             notificationBody += `: ${event.description}`;
                         }
 
-                        // Send notification via Gurasuraisu API
-                        Gurasuraisu.showNotification(`Event starting now`, {
+                        // Send notification via Polygol API
+                        Polygol.showNotification(`Event starting now`, {
                             heading: '${event.title}',
                             icon: 'calendar_clock', // Material Symbols icon name
                             buttonText: "Details", // Button text
-                            gurappAction: {
+                            polygolappAction: {
                                 appName: document.body.dataset.appName, // "Fantaskical"
-                                functionName: "openEventDetailsModal", // Function to call in this Gurapp
+                                functionName: "openEventDetailsModal", // Function to call in this Polygolapp
                                 args: [event.id] // Pass the event ID as an argument
                             }
                         });
@@ -1207,9 +1263,9 @@
             });
         }
 
-        window.addEventListener('GurasuraisuReady', () => {
+        window.addEventListener('PolygolReady', () => {
             // 1. Calendar Today View
-            Gurasuraisu.registerWidget({
+            Polygol.registerWidget({
                 appName: 'Fantaskical',
                 widgetId: 'fantaskical-today-view',
                 title: 'Today\'s Events',
@@ -1219,7 +1275,7 @@
             });
         
             // 2. Calendar Big Date
-            Gurasuraisu.registerWidget({
+            Polygol.registerWidget({
                 appName: 'Fantaskical',
                 widgetId: 'fantaskical-big-date',
                 title: 'Date',
@@ -1229,7 +1285,7 @@
             });
         
             // 3. Calendar Month View
-            Gurasuraisu.registerWidget({
+            Polygol.registerWidget({
                 appName: 'Fantaskical',
                 widgetId: 'fantaskical-month-view',
                 title: 'Month Calendar',
@@ -1239,7 +1295,7 @@
             });
         
             // 4. Top 4 Recent Active Tasks
-            Gurasuraisu.registerWidget({
+            Polygol.registerWidget({
                 appName: 'Fantaskical',
                 widgetId: 'fantaskical-recent-tasks',
                 title: 'Recent Tasks',
@@ -1251,7 +1307,7 @@
 
         // Check for events every minute (or more frequently if needed, e.g., every 10 seconds for more precision)
         setInterval(checkEventsForNotifications, 60 * 1000); 
-        // Run once on load to catch any events that started while Gurapp was closed
+        // Run once on load to catch any events that started while Polygolapp was closed
         checkEventsForNotifications();
     </script>
 </body>
