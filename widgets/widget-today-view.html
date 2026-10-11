@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="../lang.js">
-        // --- Internationalization (i18n) Support ---
+    <script src="../lang.js"></script>
+    <script>
         function getAppLanguage() {
             let l = (localStorage.getItem('language') || localStorage.getItem('selectedLanguage') || 'EN').toUpperCase();
             if (l === 'JA') l = 'JP';
@@ -14,9 +14,7 @@
             const lang = getAppLanguage();
             const dict = window['LANG_' + lang + '_FANTASKICAL'] || window['LANG_EN_FANTASKICAL'] || {};
             let str = dict[key] || key;
-            Object.keys(params).forEach(p => {
-                str = str.replace(new RegExp('\\{' + p + '\\}', 'g'), params[p]);
-            });
+            Object.keys(params).forEach(p => str = str.replace(new RegExp('\\{' + p + '\\}', 'g'), params[p]));
             return str;
         }
 
@@ -25,27 +23,7 @@
             const lang = getAppLanguage();
             const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
             document.documentElement.lang = bcpMap[lang] || 'en-US';
-            document.querySelectorAll('[data-lang-key]').forEach(el => {
-                const k = el.getAttribute('data-lang-key');
-                if (k) {
-                    if (el.tagName === 'TITLE') {
-                        document.title = t(k);
-                    } else {
-                        el.textContent = t(k);
-                    }
-                }
-            });
-            document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
-                const k = el.getAttribute('data-lang-placeholder');
-                if (k) el.placeholder = t(k);
-            });
-            document.querySelectorAll('[data-lang-title]').forEach(el => {
-                const k = el.getAttribute('data-lang-title');
-                if (k) el.title = t(k);
-            });
-            if (typeof onLanguageChanged === 'function') {
-                onLanguageChanged(lang);
-            }
+            if (typeof updateTodaysEvents === 'function') updateTodaysEvents();
         }
 
         window.addEventListener('message', (e) => {
@@ -54,11 +32,15 @@
             }
         });
 
-        window.addEventListener('DOMContentLoaded', () => applyLanguage());
-        
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'language' || e.key === 'selectedLanguage') {
+                applyLanguage(e.newValue);
+            }
+        });
 
+        window.addEventListener('DOMContentLoaded', () => applyLanguage());
     </script>
-    <title>Today's Events</title>
+    <title data-lang-key="TODAYS_EVENTS">Today's Events</title>
     <script src="https://cdn.jsdelivr.net/gh/Polygol/polygol.github.io@main/assets/polygolapp/api/polygol-api.js"></script>
     <style>
         :root {
@@ -92,7 +74,6 @@
         }
         .events-list {
             flex-grow: 1;
-            overflow-y: none;
             font-size: 14px;
         }
         .event-item {
@@ -101,7 +82,7 @@
         }
         .event-time {
             color: var(--secondary-text-color);
-            width: 60px;
+            width: 70px;
             flex-shrink: 0;
         }
         .event-title {
@@ -117,31 +98,35 @@
 <body>
     <div class="widget-container">
         <div class="header" id="widgetHeader"></div>
-        <div class="events-list" id="eventsList">Loading...</div>
+        <div class="events-list" id="eventsList"></div>
     </div>
     <script>
+        let updateTodaysEvents;
         document.addEventListener('DOMContentLoaded', () => {
             const eventsList = document.getElementById('eventsList');
             const widgetHeader = document.getElementById('widgetHeader');
     
-            // Set the header date immediately on load
-            const today = new Date();
-            widgetHeader.textContent = today.toLocaleDateString((function(){ const l = (localStorage.getItem('language') || 'EN').toUpperCase(); const m = {EN:'en-US',JP:'ja-JP',KO:'ko-KR',ZH:'zh-CN'}; return m[l==='JA'?'JP':l]||'en-US'; })(), {
-                weekday: 'short',
-                day: 'numeric',
-                month: 'short'
-            });
-    
-            function updateTodaysEvents() {
+            updateTodaysEvents = function() {
                 try {
+                    const today = new Date();
+                    const lang = getAppLanguage();
+                    const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
+                    const locale = bcpMap[lang] || 'en-US';
+                    
+                    widgetHeader.textContent = today.toLocaleDateString(locale, {
+                        weekday: 'short',
+                        day: 'numeric',
+                        month: 'short'
+                    });
+    
                     const events = JSON.parse(localStorage.getItem('events')) || [];
     
                     function formatTime(timeStr) {
-                        if (!timeStr) return 'All-day';
+                        if (!timeStr) return t('ALL_DAY');
                         const [hours, minutes] = timeStr.split(':');
                         const date = new Date();
                         date.setHours(parseInt(hours), parseInt(minutes));
-                        return date.toLocaleTimeString((function(){ const l = (localStorage.getItem('language') || 'EN').toUpperCase(); const m = {EN:'en-US',JP:'ja-JP',KO:'ko-KR',ZH:'zh-CN'}; return m[l==='JA'?'JP':l]||'en-US'; })(), { hour: 'numeric', minute: '2-digit', hour12: true });
+                        return date.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
                     }
     
                     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -151,7 +136,7 @@
                         .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
     
                     if (todaysEvents.length === 0) {
-                        eventsList.innerHTML = '<div class="no-events">No events scheduled</div>';
+                        eventsList.innerHTML = `<div class="no-events">${t('NO_EVENTS_SCHEDULED')}</div>`;
                     } else {
                         eventsList.innerHTML = todaysEvents.map(event => `
                             <div class="event-item">
@@ -161,17 +146,13 @@
                         `).join('');
                     }
                 } catch (e) {
-                    eventsList.innerHTML = '<div class="no-events">Error</div>';
+                    eventsList.innerHTML = `<div class="no-events">${t('LOADING')}</div>`;
                 }
-            }
+            };
     
             window.addEventListener('storage', (event) => {
-                if (event.key === 'events') {
-                    updateTodaysEvents();
-                }
-                if (event.key === 'theme') {
-                    document.body.classList.toggle('light-theme', event.newValue === 'light');
-                }
+                if (event.key === 'events') updateTodaysEvents();
+                if (event.key === 'theme') document.body.classList.toggle('light-theme', event.newValue === 'light');
             });
     
             updateTodaysEvents();

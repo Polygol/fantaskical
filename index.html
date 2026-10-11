@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title data-lang-key="TITLE">Fantaskical</title>
-    <script src="lang.js">
+    <script src="lang.js"></script>
+    <script>
         // --- Internationalization (i18n) Support ---
         function getAppLanguage() {
             let l = (localStorage.getItem('language') || localStorage.getItem('selectedLanguage') || 'EN').toUpperCase();
@@ -27,6 +28,7 @@
             const lang = getAppLanguage();
             const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
             document.documentElement.lang = bcpMap[lang] || 'en-US';
+            
             document.querySelectorAll('[data-lang-key]').forEach(el => {
                 const k = el.getAttribute('data-lang-key');
                 if (k) {
@@ -56,9 +58,13 @@
             }
         });
 
-        window.addEventListener('DOMContentLoaded', () => applyLanguage());
-        
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'language' || e.key === 'selectedLanguage') {
+                applyLanguage(e.newValue);
+            }
+        });
 
+        window.addEventListener('DOMContentLoaded', () => applyLanguage());
     </script>
     <link rel="icon" href="favicon.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -825,7 +831,9 @@
         }
         
         function formatMonthYear(date) {
-            return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            const lang = getAppLanguage();
+            const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
+            return date.toLocaleDateString(bcpMap[lang] || 'en-US', { month: 'long', year: 'numeric' });
         }
         
         function hasEvents(year, month, day) {
@@ -910,19 +918,21 @@
         
         function formatDateForDisplay(dateStr) {
             const date = parseDate(dateStr);
-            return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            const lang = getAppLanguage();
+            const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
+            return date.toLocaleDateString(bcpMap[lang] || 'en-US', { weekday: 'short', month: 'short', day: 'numeric' });
         }
         
         function formatTime(timeStr) {
             if (!timeStr) return '';
-            
             try {
                 const [hours, minutes] = timeStr.split(':');
                 const date = new Date();
                 date.setHours(parseInt(hours, 10));
                 date.setMinutes(parseInt(minutes, 10));
-                
-                return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                const lang = getAppLanguage();
+                const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
+                return date.toLocaleTimeString(bcpMap[lang] || 'en-US', { hour: 'numeric', minute: '2-digit' });
             } catch (e) {
                 return timeStr;
             }
@@ -974,7 +984,7 @@
                     if (event.startTime) {
                         timeElement.textContent = formatTime(event.startTime);
                     } else {
-                        timeElement.textContent = 'All day';
+                        timeElement.textContent = t("ALL_DAY");
                     }
                     
                     const textElement = document.createElement('div');
@@ -1012,7 +1022,7 @@
             if (!addedHeader) {
                 const noEventsMsg = document.createElement('div');
                 noEventsMsg.className = 'event-date-header';
-                noEventsMsg.textContent = 'No upcoming events';
+                noEventsMsg.textContent = t("NO_UPCOMING_EVENTS");
                 noEventsMsg.style.textAlign = 'center';
                 noEventsMsg.style.marginTop = '30px';
                 eventsList.appendChild(noEventsMsg);
@@ -1097,14 +1107,14 @@
         function openEventDetailsModal(eventId) {
             const event = events.find(e => e.id === eventId);
             if (!event) {
-                Polygol.showPopup("Event not found!");
+                Polygol.showPopup(t("EVENT_NOT_FOUND"));
                 return;
             }
 
             detailsModalTitle.textContent = event.title; // Set modal title to event title
             detailsTitleDisplay.textContent = event.title;
             detailsDateDisplay.textContent = formatDateForDisplay(event.date);
-            detailsTimeDisplay.textContent = `${event.startTime ? formatTime(event.startTime) : 'All Day'} ${event.endTime ? ' - ' + formatTime(event.endTime) : ''}`;
+            detailsTimeDisplay.textContent = `${event.startTime ? formatTime(event.startTime) : t("ALL_DAY")} ${event.endTime ? " - " + formatTime(event.endTime) : ""}`;
             detailsDescriptionDisplay.textContent = event.description || 'No description provided.';
 
             eventDetailsModal.classList.add('show');
@@ -1238,16 +1248,16 @@
                     const nowMoment = moment();
 
                     if (eventMoment.isSameOrBefore(nowMoment) && eventMoment.isAfter(nowMoment.clone().subtract(5, 'minutes'))) {
-                        let notificationBody = event.startTime ? `Starts at ${formatTime(event.startTime)}` : 'All day';
+                        let notificationBody = event.startTime ? t("NOTIFICATION_BODY_TIME", {time: formatTime(event.startTime)}) : t("NOTIFICATION_BODY_ALLDAY");
                         if (event.description) {
                             notificationBody += `: ${event.description}`;
                         }
 
                         // Send notification via Polygol API
-                        Polygol.showNotification(`Event starting now`, {
+                        Polygol.showNotification(t('EVENT_STARTING_NOW'), {
                             heading: '${event.title}',
                             icon: 'calendar_clock', // Material Symbols icon name
-                            buttonText: "Details", // Button text
+                            buttonText: t("DETAILS"), // Button text
                             polygolappAction: {
                                 appName: document.body.dataset.appName, // "Fantaskical"
                                 functionName: "openEventDetailsModal", // Function to call in this Polygolapp

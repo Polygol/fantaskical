@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="../lang.js">
-        // --- Internationalization (i18n) Support ---
+    <script src="../lang.js"></script>
+    <script>
         function getAppLanguage() {
             let l = (localStorage.getItem('language') || localStorage.getItem('selectedLanguage') || 'EN').toUpperCase();
             if (l === 'JA') l = 'JP';
@@ -14,9 +14,7 @@
             const lang = getAppLanguage();
             const dict = window['LANG_' + lang + '_FANTASKICAL'] || window['LANG_EN_FANTASKICAL'] || {};
             let str = dict[key] || key;
-            Object.keys(params).forEach(p => {
-                str = str.replace(new RegExp('\\{' + p + '\\}', 'g'), params[p]);
-            });
+            Object.keys(params).forEach(p => str = str.replace(new RegExp('\\{' + p + '\\}', 'g'), params[p]));
             return str;
         }
 
@@ -25,27 +23,7 @@
             const lang = getAppLanguage();
             const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
             document.documentElement.lang = bcpMap[lang] || 'en-US';
-            document.querySelectorAll('[data-lang-key]').forEach(el => {
-                const k = el.getAttribute('data-lang-key');
-                if (k) {
-                    if (el.tagName === 'TITLE') {
-                        document.title = t(k);
-                    } else {
-                        el.textContent = t(k);
-                    }
-                }
-            });
-            document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
-                const k = el.getAttribute('data-lang-placeholder');
-                if (k) el.placeholder = t(k);
-            });
-            document.querySelectorAll('[data-lang-title]').forEach(el => {
-                const k = el.getAttribute('data-lang-title');
-                if (k) el.title = t(k);
-            });
-            if (typeof onLanguageChanged === 'function') {
-                onLanguageChanged(lang);
-            }
+            if (typeof renderMonth === 'function') renderMonth();
         }
 
         window.addEventListener('message', (e) => {
@@ -54,9 +32,13 @@
             }
         });
 
-        window.addEventListener('DOMContentLoaded', () => applyLanguage());
-        
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'language' || e.key === 'selectedLanguage') {
+                applyLanguage(e.newValue);
+            }
+        });
 
+        window.addEventListener('DOMContentLoaded', () => applyLanguage());
     </script>
     <title>Month View</title>
     <script src="https://cdn.jsdelivr.net/gh/Polygol/polygol.github.io@main/assets/polygolapp/api/polygol-api.js"></script>
@@ -114,12 +96,13 @@
         <div class="calendar-grid" id="calendarGrid"></div>
     </div>
     <script>
+    let renderMonth;
     document.addEventListener('DOMContentLoaded', () => {
         const monthDisplay = document.getElementById('monthDisplay');
         const calendarGrid = document.getElementById('calendarGrid');
         const currentDate = new Date();
     
-        function renderMonth() {
+        renderMonth = function() {
             try {
                 const events = JSON.parse(localStorage.getItem('events')) || [];
     
@@ -131,49 +114,49 @@
                 const year = currentDate.getFullYear();
                 const month = currentDate.getMonth();
                 const today = new Date();
+                const lang = getAppLanguage();
+                const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
+                const locale = bcpMap[lang] || 'en-US';
     
-                monthDisplay.textContent = currentDate.toLocaleDateString((function(){ const l = (localStorage.getItem('language') || 'EN').toUpperCase(); const m = {EN:'en-US',JP:'ja-JP',KO:'ko-KR',ZH:'zh-CN'}; return m[l==='JA'?'JP':l]||'en-US'; })(), { month: 'long', year: 'numeric' });
-                calendarGrid.innerHTML = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => `<div class="grid-cell weekday">${d}</div>`).join('');
+                monthDisplay.textContent = currentDate.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+                
+                const weekHeaders = {
+                    EN: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+                    JP: ['日', '月', '火', '水', '木', '金', '土'],
+                    KO: ['일', '월', '화', '수', '목', '금', '토'],
+                    ZH: ['日', '一', '二', '三', '四', '五', '六']
+                }[lang] || ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                
+                calendarGrid.innerHTML = weekHeaders.map(d => `<div class="grid-cell weekday">${d}</div>`).join('');
     
                 const firstDay = new Date(year, month, 1).getDay();
                 const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const prevMonthDays = new Date(year, month, 0).getDate();
     
-                for (let i = 0; i < firstDay; i++) {
-                    calendarGrid.insertAdjacentHTML('beforeend', '<div class="grid-cell"></div>');
+                for (let i = firstDay - 1; i >= 0; i--) {
+                    const day = prevMonthDays - i;
+                    calendarGrid.innerHTML += `<div class="grid-cell other-month">${day}</div>`;
                 }
     
                 for (let day = 1; day <= daysInMonth; day++) {
-                    const dayCell = document.createElement('div');
-                    dayCell.className = 'grid-cell';
-                    const daySpan = document.createElement('span');
-                    daySpan.className = 'calendar-day';
-                    daySpan.textContent = day;
-    
-                    if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-                        daySpan.classList.add('current-day');
-                    }
-                    if (hasEvents(year, month, day)) {
-                        daySpan.classList.add('has-events');
-                    }
-                    dayCell.appendChild(daySpan);
-                    calendarGrid.appendChild(dayCell);
+                    const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                    const hasEvent = hasEvents(year, month, day);
+                    calendarGrid.innerHTML += `<div class="grid-cell ${isToday ? 'current-day' : ''} ${hasEvent ? 'has-events' : ''}">${day}</div>`;
                 }
-            } catch(e) {
-                monthDisplay.textContent = "Error";
-            }
-        }
     
-        // Listen for changes
+                const totalCells = firstDay + daysInMonth;
+                const nextMonthDays = 35 - totalCells > 0 ? 35 - totalCells : 42 - totalCells;
+                for (let day = 1; day <= nextMonthDays; day++) {
+                    calendarGrid.innerHTML += `<div class="grid-cell other-month">${day}</div>`;
+                }
+            } catch(e) {}
+        };
+    
         window.addEventListener('storage', (event) => {
-            if (event.key === 'events') {
-                renderMonth();
-            }
-            if (event.key === 'theme') {
-                document.body.classList.toggle('light-theme', event.newValue === 'light');
-            }
+            if (event.key === 'events') renderMonth();
+            if (event.key === 'theme') document.body.classList.toggle('light-theme', event.newValue === 'light');
         });
     
-        // Initial render
         renderMonth();
     });
     </script>

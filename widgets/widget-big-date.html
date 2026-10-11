@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="../lang.js">
-        // --- Internationalization (i18n) Support ---
+    <script src="../lang.js"></script>
+    <script>
         function getAppLanguage() {
             let l = (localStorage.getItem('language') || localStorage.getItem('selectedLanguage') || 'EN').toUpperCase();
             if (l === 'JA') l = 'JP';
@@ -14,9 +14,7 @@
             const lang = getAppLanguage();
             const dict = window['LANG_' + lang + '_FANTASKICAL'] || window['LANG_EN_FANTASKICAL'] || {};
             let str = dict[key] || key;
-            Object.keys(params).forEach(p => {
-                str = str.replace(new RegExp('\\{' + p + '\\}', 'g'), params[p]);
-            });
+            Object.keys(params).forEach(p => str = str.replace(new RegExp('\\{' + p + '\\}', 'g'), params[p]));
             return str;
         }
 
@@ -25,27 +23,7 @@
             const lang = getAppLanguage();
             const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
             document.documentElement.lang = bcpMap[lang] || 'en-US';
-            document.querySelectorAll('[data-lang-key]').forEach(el => {
-                const k = el.getAttribute('data-lang-key');
-                if (k) {
-                    if (el.tagName === 'TITLE') {
-                        document.title = t(k);
-                    } else {
-                        el.textContent = t(k);
-                    }
-                }
-            });
-            document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
-                const k = el.getAttribute('data-lang-placeholder');
-                if (k) el.placeholder = t(k);
-            });
-            document.querySelectorAll('[data-lang-title]').forEach(el => {
-                const k = el.getAttribute('data-lang-title');
-                if (k) el.title = t(k);
-            });
-            if (typeof onLanguageChanged === 'function') {
-                onLanguageChanged(lang);
-            }
+            if (typeof updateDate === 'function') updateDate(true);
         }
 
         window.addEventListener('message', (e) => {
@@ -54,9 +32,13 @@
             }
         });
 
-        window.addEventListener('DOMContentLoaded', () => applyLanguage());
-        
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'language' || e.key === 'selectedLanguage') {
+                applyLanguage(e.newValue);
+            }
+        });
 
+        window.addEventListener('DOMContentLoaded', () => applyLanguage());
     </script>
     <title>Date Widget</title>
     <script src="https://cdn.jsdelivr.net/gh/Polygol/polygol.github.io@main/assets/polygolapp/api/polygol-api.js"></script>
@@ -103,24 +85,25 @@
         const weekdayEl = document.getElementById('weekday');
         const dayEl = document.getElementById('day');
         let displayedDay = null;
+        let displayedLang = null;
     
-        function updateDate() {
+        function updateDate(force = false) {
             const today = new Date();
             const currentDay = today.getDate();
+            const lang = getAppLanguage();
+            const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
+            const locale = bcpMap[lang] || 'en-US';
             
-            // Only update the DOM if the day has actually changed
-            if (currentDay !== displayedDay) {
-                weekdayEl.textContent = today.toLocaleDateString((function(){ const l = (localStorage.getItem('language') || 'EN').toUpperCase(); const m = {EN:'en-US',JP:'ja-JP',KO:'ko-KR',ZH:'zh-CN'}; return m[l==='JA'?'JP':l]||'en-US'; })(), { weekday: 'long' });
+            if (force || currentDay !== displayedDay || lang !== displayedLang) {
+                weekdayEl.textContent = today.toLocaleDateString(locale, { weekday: 'long' });
                 dayEl.textContent = currentDay;
                 displayedDay = currentDay;
+                displayedLang = lang;
             }
         }
     
-        // Run the check every minute to catch the change at midnight
         setInterval(updateDate, 60000);
-    
-        // Initial render
-        updateDate();
+        updateDate(true);
     </script>
-    </body>
+</body>
 </html>

@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="../lang.js">
-        // --- Internationalization (i18n) Support ---
+    <script src="../lang.js"></script>
+    <script>
         function getAppLanguage() {
             let l = (localStorage.getItem('language') || localStorage.getItem('selectedLanguage') || 'EN').toUpperCase();
             if (l === 'JA') l = 'JP';
@@ -14,9 +14,7 @@
             const lang = getAppLanguage();
             const dict = window['LANG_' + lang + '_FANTASKICAL'] || window['LANG_EN_FANTASKICAL'] || {};
             let str = dict[key] || key;
-            Object.keys(params).forEach(p => {
-                str = str.replace(new RegExp('\\{' + p + '\\}', 'g'), params[p]);
-            });
+            Object.keys(params).forEach(p => str = str.replace(new RegExp('\\{' + p + '\\}', 'g'), params[p]));
             return str;
         }
 
@@ -25,27 +23,7 @@
             const lang = getAppLanguage();
             const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
             document.documentElement.lang = bcpMap[lang] || 'en-US';
-            document.querySelectorAll('[data-lang-key]').forEach(el => {
-                const k = el.getAttribute('data-lang-key');
-                if (k) {
-                    if (el.tagName === 'TITLE') {
-                        document.title = t(k);
-                    } else {
-                        el.textContent = t(k);
-                    }
-                }
-            });
-            document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
-                const k = el.getAttribute('data-lang-placeholder');
-                if (k) el.placeholder = t(k);
-            });
-            document.querySelectorAll('[data-lang-title]').forEach(el => {
-                const k = el.getAttribute('data-lang-title');
-                if (k) el.title = t(k);
-            });
-            if (typeof onLanguageChanged === 'function') {
-                onLanguageChanged(lang);
-            }
+            if (typeof updateTasks === 'function') updateTasks();
         }
 
         window.addEventListener('message', (e) => {
@@ -54,9 +32,13 @@
             }
         });
 
-        window.addEventListener('DOMContentLoaded', () => applyLanguage());
-        
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'language' || e.key === 'selectedLanguage') {
+                applyLanguage(e.newValue);
+            }
+        });
 
+        window.addEventListener('DOMContentLoaded', () => applyLanguage());
     </script>
     <title>Recent Tasks</title>
     <script src="https://cdn.jsdelivr.net/gh/Polygol/polygol.github.io@main/assets/polygolapp/api/polygol-api.js"></script>
@@ -70,9 +52,19 @@
             --secondary-text-color: rgba(0, 0, 0, 0.7);
         }
         body {
-            background: transparent; font-family: 'Inter', sans-serif;
-            color: var(--text-color); margin: 0; padding: 20px;
-            height: 100vh; box-sizing: border-box; overflow: hidden;
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .widget-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
         .header {
             font-weight: bold; font-size: 18px; margin-bottom: 10px;
@@ -100,29 +92,28 @@
 <body>
     <div class="widget-container">
         <div class="header" id="widgetHeader"></div>
-        <div class="task-list" id="taskList">Loading...</div>
+        <div class="task-list" id="taskList"></div>
     </div>
     <script>
+        let updateTasks;
         document.addEventListener('DOMContentLoaded', () => {
             const taskList = document.getElementById('taskList');
             const widgetHeader = document.getElementById('widgetHeader');
         
-            function updateTasks() {
+            updateTasks = function() {
                 try {
                     const allTasks = JSON.parse(localStorage.getItem('tasks')) || [];
                     const allActiveTasks = allTasks.filter(task => !task.completed);
-                    
-                    // Update header with the total count of active tasks
                     const activeCount = allActiveTasks.length;
-                    widgetHeader.textContent = `${activeCount} active ${activeCount === 1 ? 'task' : 'tasks'}`;
+                    
+                    widgetHeader.textContent = t('ACTIVE_TASKS_COUNT', {count: activeCount}) || `${activeCount} active tasks`;
         
-                    // Get the 4 most recent tasks to display in the list
                     const tasksToDisplay = allActiveTasks
                         .sort((a, b) => b.id - a.id)
                         .slice(0, 4);
         
                     if (tasksToDisplay.length === 0) {
-                        taskList.innerHTML = '<div class="no-tasks">All tasks complete</div>';
+                        taskList.innerHTML = `<div class="no-tasks">${t('ALL_TASKS_COMPLETE')}</div>`;
                     } else {
                         taskList.innerHTML = tasksToDisplay.map(task => `
                             <div class="task-item">
@@ -132,18 +123,14 @@
                         `).join('');
                     }
                 } catch(e) {
-                    taskList.innerHTML = '<div class="no-tasks">Error</div>';
-                    widgetHeader.textContent = 'Active Tasks';
+                    taskList.innerHTML = `<div class="no-tasks">${t('LOADING')}</div>`;
+                    widgetHeader.textContent = t('ACTIVE_TASKS');
                 }
-            }
+            };
         
             window.addEventListener('storage', (event) => {
-                if (event.key === 'tasks') {
-                    updateTasks();
-                }
-                if (event.key === 'theme') {
-                    document.body.classList.toggle('light-theme', event.newValue === 'light');
-                }
+                if (event.key === 'tasks') updateTasks();
+                if (event.key === 'theme') document.body.classList.toggle('light-theme', event.newValue === 'light');
             });
         
             updateTasks();

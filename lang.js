@@ -1,4 +1,5 @@
-const LANG_EN_FANTASKICAL = {
+// Polygol Fantaskical Language Dictionary
+window.LANG_EN_FANTASKICAL = {
     TITLE: "Fantaskical",
     TASKS: "Tasks",
     CALENDAR: "Calendar",
@@ -34,10 +35,21 @@ const LANG_EN_FANTASKICAL = {
     WED: "Wed",
     THU: "Thu",
     FRI: "Fri",
-    SAT: "Sat"
+    SAT: "Sat",
+    RECENT_TASKS: "Recent Tasks",
+    LOADING: "Loading...",
+    TODAYS_EVENTS: "Today's Events",
+    NO_EVENTS_SCHEDULED: "No events scheduled",
+    EVENT_NOT_FOUND: "Event not found!",
+    EVENT_STARTING_NOW: "Event starting now",
+    DETAILS: "Details",
+    CLEAR_ALL: "Clear All",
+    DELETE: "Delete",
+    EDIT: "Edit",
+    CANCEL: "Cancel"
 };
 
-const LANG_JP_FANTASKICAL = {
+window.LANG_JP_FANTASKICAL = {
     TITLE: "Fantaskical",
     TASKS: "タスク",
     CALENDAR: "カレンダー",
@@ -54,17 +66,17 @@ const LANG_JP_FANTASKICAL = {
     TIME_LABEL: "時刻",
     DESCRIPTION_LABEL: "説明",
     SAVE_EVENT_BTN: "イベントを保存",
-    EVENT_DETAILS_TITLE: "イベント詳細",
+    EVENT_DETAILS_TITLE: "イベントの詳細",
     ALL_DAY: "終日",
     NO_DESCRIPTION: "説明はありません。",
     CLOSE_BTN: "閉じる",
     NO_UPCOMING_EVENTS: "今後のイベントはありません",
-    NO_TASKS: "ここにタスクはありません。追加して始めましょう！",
+    NO_TASKS: "タスクはありません。追加して始めましょう！",
     ALL_TASKS_COMPLETE: "すべてのタスクが完了しました",
-    ACTIVE_TASKS_COUNT: "{count}件のアクティブなタスク",
+    ACTIVE_TASKS_COUNT: "進行中のタスク {count}件",
     ACTIVE_TASKS: "アクティブなタスク",
-    NOTIFICATION_TITLE: "イベント：{title}",
-    NOTIFICATION_BODY_TIME: "{time}に開始",
+    NOTIFICATION_TITLE: "イベント: {title}",
+    NOTIFICATION_BODY_TIME: "{time} 開始",
     NOTIFICATION_BODY_ALLDAY: "終日",
     NOTIFICATION_VIEW_DETAILS: "詳細を見る",
     SUN: "日",
@@ -73,17 +85,28 @@ const LANG_JP_FANTASKICAL = {
     WED: "水",
     THU: "木",
     FRI: "金",
-    SAT: "土"
+    SAT: "土",
+    RECENT_TASKS: "最近のタスク",
+    LOADING: "読み込み中...",
+    TODAYS_EVENTS: "今日の予定",
+    NO_EVENTS_SCHEDULED: "予定されているイベントはありません",
+    EVENT_NOT_FOUND: "イベントが見つかりません！",
+    EVENT_STARTING_NOW: "イベントがまもなく始まります",
+    DETAILS: "詳細",
+    CLEAR_ALL: "すべてクリア",
+    DELETE: "削除",
+    EDIT: "編集",
+    CANCEL: "キャンセル"
 };
 
-const LANG_KO_FANTASKICAL = {
+window.LANG_KO_FANTASKICAL = {
     TITLE: "Fantaskical",
-    TASKS: "작업",
+    TASKS: "할 일",
     CALENDAR: "캘린더",
-    ALL: "모두",
-    ACTIVE: "활성",
+    ALL: "전체",
+    ACTIVE: "진행 중",
     COMPLETED: "완료됨",
-    ADD_TASK_PLACEHOLDER: "작업 추가",
+    ADD_TASK_PLACEHOLDER: "할 일 추가",
     ADD_EVENT_PLACEHOLDER: "이벤트 추가",
     ADD_EVENT_MODAL_TITLE: "새 이벤트 추가",
     EVENT_TITLE_LABEL: "이벤트 제목",
@@ -94,17 +117,17 @@ const LANG_KO_FANTASKICAL = {
     DESCRIPTION_LABEL: "설명",
     SAVE_EVENT_BTN: "이벤트 저장",
     EVENT_DETAILS_TITLE: "이벤트 상세 정보",
-    ALL_DAY: "하루 종일",
+    ALL_DAY: "종일",
     NO_DESCRIPTION: "설명이 제공되지 않았습니다.",
     CLOSE_BTN: "닫기",
-    NO_UPCOMING_EVENTS: "예정된 이벤트 없음",
-    NO_TASKS: "여기에 작업이 없습니다. 시작하려면 하나 추가하세요!",
-    ALL_TASKS_COMPLETE: "모든 작업 완료",
-    ACTIVE_TASKS_COUNT: "활성 작업 {count}개",
-    ACTIVE_TASKS: "활성 작업",
+    NO_UPCOMING_EVENTS: "다가오는 이벤트 없음",
+    NO_TASKS: "할 일이 없습니다. 시작하려면 추가하세요!",
+    ALL_TASKS_COMPLETE: "모든 할 일 완료",
+    ACTIVE_TASKS_COUNT: "진행 중인 할 일 {count}개",
+    ACTIVE_TASKS: "진행 중인 할 일",
     NOTIFICATION_TITLE: "이벤트: {title}",
     NOTIFICATION_BODY_TIME: "{time}에 시작",
-    NOTIFICATION_BODY_ALLDAY: "하루 종일",
+    NOTIFICATION_BODY_ALLDAY: "종일",
     NOTIFICATION_VIEW_DETAILS: "세부 정보 보기",
     SUN: "일",
     MON: "월",
@@ -112,15 +135,26 @@ const LANG_KO_FANTASKICAL = {
     WED: "수",
     THU: "목",
     FRI: "금",
-    SAT: "토"
+    SAT: "토",
+    RECENT_TASKS: "최근 할 일",
+    LOADING: "로딩 중...",
+    TODAYS_EVENTS: "오늘의 이벤트",
+    NO_EVENTS_SCHEDULED: "예정된 이벤트 없음",
+    EVENT_NOT_FOUND: "이벤트를 찾을 수 없습니다!",
+    EVENT_STARTING_NOW: "이벤트가 지금 시작됩니다",
+    DETAILS: "상세",
+    CLEAR_ALL: "모두 지우기",
+    DELETE: "삭제",
+    EDIT: "편집",
+    CANCEL: "취소"
 };
 
-const LANG_ZH_FANTASKICAL = {
+window.LANG_ZH_FANTASKICAL = {
     TITLE: "Fantaskical",
     TASKS: "任务",
     CALENDAR: "日历",
     ALL: "全部",
-    ACTIVE: "进行中",
+    ACTIVE: "未完成",
     COMPLETED: "已完成",
     ADD_TASK_PLACEHOLDER: "添加任务",
     ADD_EVENT_PLACEHOLDER: "添加事件",
@@ -137,10 +171,10 @@ const LANG_ZH_FANTASKICAL = {
     NO_DESCRIPTION: "未提供描述。",
     CLOSE_BTN: "关闭",
     NO_UPCOMING_EVENTS: "没有即将到来的事件",
-    NO_TASKS: "这里没有任务。添加一个以开始！",
+    NO_TASKS: "暂无任务。添加一个以开始！",
     ALL_TASKS_COMPLETE: "所有任务已完成",
-    ACTIVE_TASKS_COUNT: "{count}个进行中的任务",
-    ACTIVE_TASKS: "进行中的任务",
+    ACTIVE_TASKS_COUNT: "{count} 个未完成任务",
+    ACTIVE_TASKS: "未完成任务",
     NOTIFICATION_TITLE: "事件：{title}",
     NOTIFICATION_BODY_TIME: "开始于 {time}",
     NOTIFICATION_BODY_ALLDAY: "全天",
@@ -151,5 +185,21 @@ const LANG_ZH_FANTASKICAL = {
     WED: "三",
     THU: "四",
     FRI: "五",
-    SAT: "六"
+    SAT: "六",
+    RECENT_TASKS: "最近任务",
+    LOADING: "加载中...",
+    TODAYS_EVENTS: "今日事件",
+    NO_EVENTS_SCHEDULED: "没有安排的事件",
+    EVENT_NOT_FOUND: "未找到事件！",
+    EVENT_STARTING_NOW: "事件现在开始",
+    DETAILS: "详情",
+    CLEAR_ALL: "全部清除",
+    DELETE: "删除",
+    EDIT: "编辑",
+    CANCEL: "取消"
 };
+
+var LANG_EN_FANTASKICAL = window.LANG_EN_FANTASKICAL;
+var LANG_JP_FANTASKICAL = window.LANG_JP_FANTASKICAL;
+var LANG_KO_FANTASKICAL = window.LANG_KO_FANTASKICAL;
+var LANG_ZH_FANTASKICAL = window.LANG_ZH_FANTASKICAL;
