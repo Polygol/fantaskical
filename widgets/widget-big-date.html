@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <script src="../lang.js"></script>
     <script>
+        const bcpMap = { EN: 'en-US', JP: 'ja-JP', KO: 'ko-KR', ZH: 'zh-CN' };
+        window.bcpMap = bcpMap;
+
         function getAppLanguage() {
             let l = (localStorage.getItem('language') || localStorage.getItem('selectedLanguage') || 'EN').toUpperCase();
             if (l === 'JA') l = 'JP';
